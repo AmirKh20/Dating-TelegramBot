@@ -22,7 +22,6 @@ async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     return True
 
 async def ReplyMessageKeyboardButton(update: Update, reply_keyboard_markup: ReplyKeyboardMarkup, text: str) -> None:
-    await update.message.reply_markdown_v2(text,
-                                           reply_to_message_id=update.message.message_id,
-                                           reply_markup=reply_keyboard_markup)
-
+    await update.message.reply_text(text,
+                                    reply_to_message_id=update.message.message_id,
+                                    reply_markup=reply_keyboard_markup)

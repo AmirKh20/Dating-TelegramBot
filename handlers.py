@@ -7,7 +7,7 @@ from utils import *
 from keyboard_buttons import keyboards
 
 async def StartHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ReplyMessageKeyboardButton(update, keyboards['default_keyboard'], 'Hello and welcome to our bot\!')
+    await ReplyMessageKeyboardButton(update, keyboards['default_keyboard'], 'Hello and welcome to our bot!')
     await SendMessage(update, context, 'Info about the bot')
     await SendMessage(update, context, 'get help using /help')
     await CheckSubs(update, context)
