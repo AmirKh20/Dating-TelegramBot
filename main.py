@@ -8,7 +8,9 @@ from telegram import Update
 from telegram.ext import (
         ApplicationBuilder,
         ContextTypes,
-        CommandHandler
+        CommandHandler,
+        MessageHandler,
+        filters,
 )
 
 import handlers
@@ -26,6 +28,8 @@ def main():
 
     application.add_handler(CommandHandler('start', handlers.StartHandler))
     application.add_handler(CommandHandler('help', handlers.HelpHandler))
+    application.add_handler(MessageHandler(filters.Regex('^مشاوره$'), handlers.ConsultationHandler))
+    application.add_handler(MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), handlers.MainMenuHandler))
 
     application.run_polling()
 
