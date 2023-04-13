@@ -5,14 +5,20 @@ from utils import *
 
 
 async def StartHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ReplyMessageKeyboardButton(update, keyboards['default_keyboard'],
-                                     'سلام و خوش آمدید به ربات سوشیانت!')
+    """
+    Runs when /start command is sent. The default home keyboards are shown.
+    """
+    await ReplyMessage(update, 'سلام و خوش آمدید به ربات سوشیانت!', keyboards['default_keyboard'])
     await SendMessage(update, context, 'اطلاعاتی درمورد ربات')
     await SendMessage(update, context, 'با دستور /help کمک بگیرید')
     await CheckSubs(update, context)
 
 
 async def HelpHandler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Runs when /help command is sent.
+    Doesn't show anything if the users is not subscribed.
+    """
     if not await CheckSubs(update, context):
         return
 
@@ -20,12 +26,16 @@ async def HelpHandler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ConsultationHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ReplyMessageKeyboardButton(update, keyboards['consultation_keyboard'],
-                                     'چه نوع مشاوره می خواهید؟')
+    """
+    Runs when مشاوره is sent. The consultation keyboard is shown.
+    """
+    await ReplyMessage(update, 'چه نوع مشاوره می خواهید؟', keyboards['consultation_keyboard'])
     await CheckSubs(update, context)
 
 
 async def MainMenuHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ReplyMessageKeyboardButton(update, keyboards['default_keyboard'],
-                                     'منوی اصلی')
+    """
+    Runs when we want to get back to the default keyboard buttons.
+    """
+    await ReplyMessage(update, 'منوی اصلی:', keyboards['default_keyboard'])
     await CheckSubs(update, context)
