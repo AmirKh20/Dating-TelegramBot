@@ -35,7 +35,7 @@ async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     return True if the user is subscribed. False otherwise
     This function is used in every handler.
     """
-    chat_member = await context.bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=update.message.chat_id)
+    chat_member = await context.bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=update.effective_user.id)
     if chat_member['status'] in ['left', 'kicked']:
         await ReplyMessage(update, f'لطفا در کانال {CHANNEL_USERNAME} عضو شوید!')
         return False
