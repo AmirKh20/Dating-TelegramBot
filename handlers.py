@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from keyboard_buttons import keyboards
 from utils import *
 
