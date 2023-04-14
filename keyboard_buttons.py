@@ -1,9 +1,11 @@
 from telegram import (
     KeyboardButton,
-    ReplyKeyboardMarkup
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove
 )
 
 keyboards = {
+    'no_keyboard': ReplyKeyboardRemove(),
     'default_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('همسان گزینی')],
         [KeyboardButton('پروفایل'), KeyboardButton('خرید پلن'), KeyboardButton('مشاوره')],
