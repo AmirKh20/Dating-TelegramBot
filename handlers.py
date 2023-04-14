@@ -1,3 +1,5 @@
+# TODO: Add Cuncurrency to some handlers or their callback functions
+
 from telegram.ext import (
     ConversationHandler,
     CommandHandler,
@@ -7,11 +9,13 @@ from telegram.ext import (
 
 from callbacks import *
 
+not_edited_messages_filter = ~filters.UpdateType.EDITED_MESSAGE
+
 # Command Handlers that runs the callback function when ever /command is sent
 commands = {
-    'Main-Menu': CommandHandler('main_menu', MainMenuCallback),
-    'Help': CommandHandler('help', HelpCallback),
-    'Start': CommandHandler('start', StartCallback),
+    'Main-Menu': CommandHandler('main_menu', MainMenuCallback, filters=not_edited_messages_filter),
+    'Help': CommandHandler('help', HelpCallback, filters=not_edited_messages_filter),
+    'Start': CommandHandler('start', StartCallback, filters=not_edited_messages_filter),
 }
 
 # Message handlers that run the callback function when ever the message contains the filters
