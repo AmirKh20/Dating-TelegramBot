@@ -30,7 +30,7 @@ async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     """
     Checks if the users is subscribed to 'CHANNEL_USERNAME'. CHANNEL_USERNAME should be set in the .env file.
     It also replies that the user should join CHANNEL_USERNAME.
-    return True if the user is subscribed. False otherwise
+    Return True if the user is subscribed. False otherwise
     This function is used in every handler.
     """
     chat_member = await context.bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=update.effective_user.id)
