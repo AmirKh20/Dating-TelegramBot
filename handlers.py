@@ -1,39 +1,37 @@
-from keyboard_buttons import keyboards
-from utils import *
+from telegram.ext import (
+    ConversationHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 
+from callbacks import *
 
-async def StartHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    Runs when /start command is sent. The default home keyboards are shown.
-    """
-    await ReplyMessage(update, 'سلام و خوش آمدید به ربات سوشیانت!', keyboards['default_keyboard'])
-    await SendMessage(update, context, 'اطلاعاتی درمورد ربات')
-    await SendMessage(update, context, 'با دستور /help کمک بگیرید')
-    await CheckSubs(update, context)
+# Command Handlers that runs the callback function when ever /command is sent
+commands = {
+    'Main-Menu': CommandHandler('main_menu', MainMenuCallback),
+    'Help': CommandHandler('help', HelpCallback),
+    'Start': CommandHandler('start', StartCallback),
+}
 
+# Message handlers that run the callback function when ever the message contains the filters
+messages = {
+    'Consultation': {
+        'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationCallback),
+        'Therapist': MessageHandler(filters.Regex('^روانشناس$'), TherapistCallback),
+    },
+    'Main-Menu': MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), MainMenuCallback)
+}
 
-async def HelpHandler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Runs when /help command is sent.
-    Doesn't show anything if the users is not subscribed.
-    """
-    if not await CheckSubs(update, context):
-        return
-
-    await SendMessage(update, context, 'این خروجی هلپ است')
-
-
-async def ConsultationHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    Runs when مشاوره is sent. The consultation keyboard is shown.
-    """
-    await ReplyMessage(update, 'چه نوع مشاوره می خواهید؟', keyboards['consultation_keyboard'])
-    await CheckSubs(update, context)
-
-
-async def MainMenuHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """
-    Runs when we want to get back to the default keyboard buttons.
-    """
-    await ReplyMessage(update, 'منوی اصلی:', keyboards['default_keyboard'])
-    await CheckSubs(update, context)
+# Conversation handlers that modify the workflow of the bot
+conversations = {
+    # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
+    'Starting': ConversationHandler(
+        entry_points=[commands['Start'], commands['Main-Menu']],
+        states={
+            MAIN_MENU_STATE: [messages['Consultation']['Menu']],
+            CONSULTATION_STATE: [messages['Consultation']['Therapist']],
+        },
+        fallbacks=[messages['Main-Menu'], commands['Main-Menu']]
+    )
+}

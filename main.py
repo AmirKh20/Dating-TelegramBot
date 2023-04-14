@@ -11,12 +11,7 @@ import logging
 from os import getenv
 
 from dotenv import load_dotenv
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    filters,
-)
+from telegram.ext import ApplicationBuilder
 
 import handlers
 
@@ -35,10 +30,9 @@ logger = logging.getLogger(__name__)
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    application.add_handler(CommandHandler('start', handlers.StartHandler))
-    application.add_handler(CommandHandler('help', handlers.HelpHandler))
-    application.add_handler(MessageHandler(filters.Regex('^مشاوره$'), handlers.ConsultationHandler))
-    application.add_handler(MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), handlers.MainMenuHandler))
+    application.add_handler(handlers.conversations['Starting'])
+    application.add_handler(handlers.commands['Help'])
+    application.add_handler(handlers.messages['Main-Menu'])
 
     application.run_polling()
 
