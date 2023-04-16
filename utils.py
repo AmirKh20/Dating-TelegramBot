@@ -1,8 +1,8 @@
-from os import getenv
-from dotenv import load_dotenv
 import json
+from os import getenv
 
-from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton
+from dotenv import load_dotenv
+from telegram import Update, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 load_dotenv()
@@ -45,6 +45,10 @@ async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
 
 
 def GetProvinceNames() -> list[str]:
+    """
+    Utility to get the provinces' names from a json file
+    :return: list of strings containing the names of the provinces.
+    """
     with open(PROVINCES_FILE, 'r') as json_file:
         data = json.load(json_file)
     names = [province['name'] for province in data]
@@ -52,18 +56,23 @@ def GetProvinceNames() -> list[str]:
 
 
 def GetProvinceNamesInlineSequence():
+    """
+    Utility to get provinces' names in a 2D list of InlineKeyboardButton with 3 columns.
+    :return: 2D list of InlineKeyboardButton.
+    """
     names = GetProvinceNames()
     number_of_provinces = len(names)
-    number_of_3_rows_elements = number_of_provinces - number_of_provinces % 3
+    number_of_3_rows_elements = number_of_provinces - number_of_provinces % 3  # for 31 provinces, this is equal to 30
 
-    l = []
+    buttons = []
     for i in range(0, number_of_3_rows_elements, 3):
-        l.append([
+        buttons.append([
             InlineKeyboardButton(names[i], callback_data=names[i]),
-            InlineKeyboardButton(names[i+1], callback_data=names[i+1]),
-            InlineKeyboardButton(names[i+2], callback_data=names[i+2])
-            ])
+            InlineKeyboardButton(names[i + 1], callback_data=names[i + 1]),
+            InlineKeyboardButton(names[i + 2], callback_data=names[i + 2])
+        ])
+    # The rest of the provinces:
     for i in range(number_of_3_rows_elements, number_of_provinces):
-        l.append([InlineKeyboardButton(names[i], callback_data=names[i])])
+        buttons.append([InlineKeyboardButton(names[i], callback_data=names[i])])
 
-    return l
+    return buttons

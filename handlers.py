@@ -1,7 +1,6 @@
 # TODO: Add Concurrency to some handlers or their callback functions
 
 from telegram.ext import (
-    ConversationHandler,
     CommandHandler,
     MessageHandler,
     filters,
@@ -31,6 +30,10 @@ messages = {
 
 # Conversation handlers that modify the workflow of the bot
 conversations = {
+    """
+    This handler starts when همسان گزینی is sent in the parent conversation handler.
+    The user click on a province after it.
+    """
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
@@ -46,10 +49,13 @@ conversations = {
 }
 # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
 conversations['Starting'] = ConversationHandler(
-    entry_points=[commands['Start'], commands['Main-Menu']],
+    entry_points=[commands['Start'],
+                  commands['Main-Menu']],
     states={
-        MAIN_MENU_STATE: [messages['Consultation']['Menu'], conversations['Hamsan-Gozini']],
+        MAIN_MENU_STATE: [messages['Consultation']['Menu'],
+                          conversations['Hamsan-Gozini']],
         CONSULTATION_STATE: [messages['Consultation']['Therapist']],
     },
-    fallbacks=[messages['Main-Menu'], commands['Main-Menu']]
-    )
+    fallbacks=[messages['Main-Menu'],
+               commands['Main-Menu']]
+)

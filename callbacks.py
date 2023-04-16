@@ -5,7 +5,7 @@ from utils import *
 
 MAIN_MENU_STATE, CONSULTATION_STATE = range(2)
 END = ConversationHandler.END
-PROVINCES = range(2, 3)
+PROVINCES = 2
 
 
 async def StartCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -58,6 +58,10 @@ async def TherapistCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 
 async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when همسان گزینی is sent.
+    Shows provinces inline keyboard if the user's profile is completed
+    """
     await SendMessage(update, context, 'چک کردن پروفایل...', button_keyboards['no_keyboard'])
     is_profile_completed = True  # TODO
 
@@ -72,11 +76,14 @@ async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAUL
 
 
 async def HamsanGoziniProvincesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user has clicked on one of the provinces.
+    """
     if not await CheckSubs(update, context):
         return END
 
     query = update.callback_query
     await query.answer()
 
-    await query.edit_message_text('لیست کاربران')
+    await query.edit_message_text('لیست کاربران')  # TODO
     return END
