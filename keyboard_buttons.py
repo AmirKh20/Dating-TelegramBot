@@ -1,10 +1,12 @@
 from telegram import (
     KeyboardButton,
     ReplyKeyboardMarkup,
-    ReplyKeyboardRemove
+    ReplyKeyboardRemove,
+    InlineKeyboardMarkup
 )
+from utils import GetProvinceNamesInlineSequence
 
-keyboards = {
+button_keyboards = {
     'no_keyboard': ReplyKeyboardRemove(),
     'default_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('همسان گزینی')],
@@ -16,4 +18,14 @@ keyboards = {
         [KeyboardButton('چت بات'), KeyboardButton('روانشناس')],
         [KeyboardButton('پرسش و پاسخ'), KeyboardButton('بازگشت به منوی اصلی')]
     ])
+}
+
+inline_keyboards = {
+    'hamsan_gozini_keyboard': {
+        'provinces': {
+            'page_1': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[0]),
+            'page_2': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[1]),
+            'page_3': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[2]),
+        }
+    }
 }

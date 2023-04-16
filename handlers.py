@@ -1,10 +1,11 @@
-# TODO: Add Cuncurrency to some handlers or their callback functions
+# TODO: Add Concurrency to some handlers or their callback functions
 
 from telegram.ext import (
     ConversationHandler,
     CommandHandler,
     MessageHandler,
     filters,
+    CallbackQueryHandler,
 )
 
 from callbacks import *
@@ -20,22 +21,37 @@ commands = {
 
 # Message handlers that run the callback function when ever the message contains the filters
 messages = {
+    'Main-Menu': MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), MainMenuCallback),
     'Consultation': {
         'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationCallback),
         'Therapist': MessageHandler(filters.Regex('^روانشناس$'), TherapistCallback),
     },
-    'Main-Menu': MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), MainMenuCallback)
+    'Hamsan-Gozini': MessageHandler(filters.Regex('^همسان گزینی$'), HamsanGoziniEntryCallback),
 }
 
 # Conversation handlers that modify the workflow of the bot
 conversations = {
-    # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
-    'Starting': ConversationHandler(
-        entry_points=[commands['Start'], commands['Main-Menu']],
+    'Hamsan-Gozini': ConversationHandler(
+        entry_points=[messages['Hamsan-Gozini']],
         states={
-            MAIN_MENU_STATE: [messages['Consultation']['Menu']],
-            CONSULTATION_STATE: [messages['Consultation']['Therapist']],
+            PROVINCE1: [CallbackQueryHandler(HamsanGoziniProvincesCallback_1)],
+            PROVINCE2: [CallbackQueryHandler(HamsanGoziniProvincesCallback_2)],
+            PROVINCE3: [CallbackQueryHandler(HamsanGoziniProvincesCallback_3)],
         },
-        fallbacks=[messages['Main-Menu'], commands['Main-Menu']]
+        fallbacks=[CallbackQueryHandler(MainMenuCallback, pattern=f'^{END}$'),
+                   commands['Main-Menu'],
+                   commands['Start']],
+        map_to_parent={
+            MAIN_MENU_STATE: MAIN_MENU_STATE,
+        }
     )
 }
+# This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
+conversations['Starting'] = ConversationHandler(
+    entry_points=[commands['Start'], commands['Main-Menu']],
+    states={
+        MAIN_MENU_STATE: [messages['Consultation']['Menu'], conversations['Hamsan-Gozini']],
+        CONSULTATION_STATE: [messages['Consultation']['Therapist']],
+    },
+    fallbacks=[messages['Main-Menu'], commands['Main-Menu']]
+    )
