@@ -5,7 +5,7 @@ from utils import *
 
 MAIN_MENU_STATE, CONSULTATION_STATE = range(2)
 END = ConversationHandler.END
-PROVINCE1, PROVINCE2, PROVINCE3 = range(2, 5)
+PROVINCES = range(2, 3)
 
 
 async def StartCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -64,60 +64,19 @@ async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAUL
     if is_profile_completed:
         await ReplyMessage(update,
                            'استان مورد نظر را انتخاب کنید',
-                           inline_keyboards['hamsan_gozini_keyboard']['provinces']['page_1'])
-        return PROVINCE1
+                           inline_keyboards['hamsan_gozini_keyboard']['provinces'])
+        return PROVINCES
 
     await SendMessage(update, context, 'پروفایل کامل نیست')
     return await MainMenuCallback(update, context)
 
 
-async def HamsanGoziniProvincesCallback_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def HamsanGoziniProvincesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if not await CheckSubs(update, context):
         return END
 
     query = update.callback_query
     await query.answer()
 
-    if query.data == 'بعدی':
-        await query.edit_message_text(text='استان مورد نظر را انتخاب کنید',
-                                      reply_markup=inline_keyboards['hamsan_gozini_keyboard']['provinces']['page_2'])
-        return PROVINCE2
-    else:  # TODO
-        await query.edit_message_text('لیست کاربران')
-        return END
-
-
-async def HamsanGoziniProvincesCallback_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if not await CheckSubs(update, context):
-        return END
-
-    query = update.callback_query
-    await query.answer()
-
-    if query.data == 'بعدی':
-        await query.edit_message_text(text='استان مورد نظر را انتخاب کنید',
-                                      reply_markup=inline_keyboards['hamsan_gozini_keyboard']['provinces']['page_3'])
-        return PROVINCE3
-    elif query.data == 'قبلی':
-        await query.edit_message_text(text='استان مورد نظر را انتخاب کنید',
-                                      reply_markup=inline_keyboards['hamsan_gozini_keyboard']['provinces']['page_1'])
-        return PROVINCE1
-    else:  # TODO
-        await query.edit_message_text('لیست کاربران')
-        return END
-
-
-async def HamsanGoziniProvincesCallback_3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if not await CheckSubs(update, context):
-        return END
-
-    query = update.callback_query
-    await query.answer()
-
-    if query.data == 'قبلی':
-        await query.edit_message_text(text='استان مورد نظر را انتخاب کنید',
-                                      reply_markup=inline_keyboards['hamsan_gozini_keyboard']['provinces']['page_2'])
-        return PROVINCE2
-    else:  # TODO
-        await query.edit_message_text('لیست کاربران')
-        return END
+    await query.edit_message_text('لیست کاربران')
+    return END

@@ -22,10 +22,6 @@ button_keyboards = {
 
 inline_keyboards = {
     'hamsan_gozini_keyboard': {
-        'provinces': {
-            'page_1': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[0]),
-            'page_2': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[1]),
-            'page_3': InlineKeyboardMarkup(GetProvinceNamesInlineSequence()[2]),
-        }
+        'provinces': InlineKeyboardMarkup(GetProvinceNamesInlineSequence())
     }
 }

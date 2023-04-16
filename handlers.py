@@ -34,15 +34,13 @@ conversations = {
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
-            PROVINCE1: [CallbackQueryHandler(HamsanGoziniProvincesCallback_1)],
-            PROVINCE2: [CallbackQueryHandler(HamsanGoziniProvincesCallback_2)],
-            PROVINCE3: [CallbackQueryHandler(HamsanGoziniProvincesCallback_3)],
+            PROVINCES: [CallbackQueryHandler(HamsanGoziniProvincesCallback)],
         },
-        fallbacks=[CallbackQueryHandler(MainMenuCallback, pattern=f'^{END}$'),
-                   commands['Main-Menu'],
+        fallbacks=[commands['Main-Menu'],
                    commands['Start']],
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,
+            END: END,
         }
     )
 }

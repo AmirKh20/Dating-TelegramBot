@@ -54,19 +54,16 @@ def GetProvinceNames() -> list[str]:
 def GetProvinceNamesInlineSequence():
     names = GetProvinceNames()
     number_of_provinces = len(names)
-    l1, l2, l3 = [], [], []
-    for i in range(number_of_provinces):
-        if i <= number_of_provinces // 3:
-            l1.append([InlineKeyboardButton(names[i], callback_data=str(i))])
-        elif i <= number_of_provinces // 3 * 2:
-            l2.append([InlineKeyboardButton(names[i], callback_data=str(i))])
-        else:
-            l3.append([InlineKeyboardButton(names[i], callback_data=str(i))])
+    number_of_3_rows_elements = number_of_provinces - number_of_provinces % 3
 
-    l1.append([InlineKeyboardButton('بعدی', callback_data='بعدی')])
-    l2.append([
-        InlineKeyboardButton('بعدی', callback_data='بعدی'),
-        InlineKeyboardButton('قبلی', callback_data='قبلی')
-    ])
-    l3.append([InlineKeyboardButton('قبلی', callback_data='قبلی')])
-    return l1, l2, l3
+    l = []
+    for i in range(0, number_of_3_rows_elements, 3):
+        l.append([
+            InlineKeyboardButton(names[i], callback_data=names[i]),
+            InlineKeyboardButton(names[i+1], callback_data=names[i+1]),
+            InlineKeyboardButton(names[i+2], callback_data=names[i+2])
+            ])
+    for i in range(number_of_3_rows_elements, number_of_provinces):
+        l.append([InlineKeyboardButton(names[i], callback_data=names[i])])
+
+    return l
