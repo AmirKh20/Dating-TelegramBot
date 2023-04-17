@@ -6,6 +6,7 @@ BOT_TOKEN: The bot token
 CHANNEL_USERNAME: username of the channel which users should be subscribed into in the format of '@username'
 LOG_FILENAME: DEFAULT: bot.log. The filename of the log file which the logs are written into
 PROVINCES_FILE: DEFAULT: provinces_cities.json. Json file containing provinces
+WEBSITE_URL: the url of the website when clicking on profile edit
 """
 
 import logging

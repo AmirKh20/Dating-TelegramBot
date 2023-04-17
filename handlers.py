@@ -26,14 +26,13 @@ messages = {
         'Therapist': MessageHandler(filters.Regex('^روانشناس$'), TherapistCallback),
     },
     'Hamsan-Gozini': MessageHandler(filters.Regex('^همسان گزینی$'), HamsanGoziniEntryCallback),
+    'Profile': MessageHandler(filters.Regex('^پروفایل$'), ProfileEntryCallback),
 }
 
 # Conversation handlers that modify the workflow of the bot
 conversations = {
-    """
-    This handler starts when همسان گزینی is sent in the parent conversation handler.
-    The user click on a province after it.
-    """
+    # This handler starts when همسان گزینی is sent in the parent conversation handler.
+    # The user clicks on a province after it.
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
@@ -45,15 +44,45 @@ conversations = {
             MAIN_MENU_STATE: MAIN_MENU_STATE,
             END: END,
         }
+    ),
+
+    'Profile': ConversationHandler(
+        entry_points=[messages['Profile']],
+        states={
+            PROFILE: [
+                CallbackQueryHandler(ProfileEditCallback, pattern='^profile_edit$'),
+                CallbackQueryHandler(ProfileContactsCallback, pattern='^contacts$'),
+                CallbackQueryHandler(ProfileLikersCallback, pattern='^likers$'),
+                CallbackQueryHandler(ProfileBlocksCallback, pattern='^blocks$'),
+                CallbackQueryHandler(ProfileNumberOfLikesOnOff, pattern='^on_off_number_likes$')
+            ],
+            PROFILE_CONTACTS: [
+                CallbackQueryHandler(BackToProfileCallback, pattern='^back_to_profile$'),
+            ],
+            PROFILE_LIKERS: [
+                CallbackQueryHandler(BackToProfileCallback, pattern='^back_to_profile$'),
+            ],
+            PROFILE_BLOCKS: [
+                CallbackQueryHandler(BackToProfileCallback, pattern='^back_to_profile$'),
+            ],
+        },
+        fallbacks=[commands['Main-Menu'],
+                   commands['Start']],
+        map_to_parent={
+            MAIN_MENU_STATE: MAIN_MENU_STATE,
+            END: END,
+        }
     )
 }
+
 # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
 conversations['Starting'] = ConversationHandler(
     entry_points=[commands['Start'],
                   commands['Main-Menu']],
     states={
         MAIN_MENU_STATE: [messages['Consultation']['Menu'],
-                          conversations['Hamsan-Gozini']],
+                          conversations['Hamsan-Gozini'],
+                          conversations['Profile']],
         CONSULTATION_STATE: [messages['Consultation']['Therapist']],
     },
     fallbacks=[messages['Main-Menu'],

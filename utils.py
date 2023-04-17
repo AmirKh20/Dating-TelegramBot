@@ -8,6 +8,7 @@ from telegram.ext import ContextTypes
 load_dotenv()
 CHANNEL_USERNAME = getenv('CHANNEL_USERNAME')
 PROVINCES_FILE = getenv('PROVINCES_FILE', 'provinces_cities.json')
+WEBSITE_URL = getenv('WEBSITE_URL')
 
 
 async def SendMessage(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, reply_markup=None) -> None:

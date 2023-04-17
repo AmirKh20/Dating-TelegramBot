@@ -6,6 +6,7 @@ from utils import *
 MAIN_MENU_STATE, CONSULTATION_STATE = range(2)
 END = ConversationHandler.END
 PROVINCES = 2
+PROFILE, PROFILE_CONTACTS, PROFILE_LIKERS, PROFILE_BLOCKS = range(3, 7)
 
 
 async def StartCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -87,3 +88,119 @@ async def HamsanGoziniProvincesCallback(update: Update, context: ContextTypes.DE
 
     await query.edit_message_text('لیست کاربران')  # TODO
     return END
+
+
+async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    text = (
+        "اسم:\n"
+        "سن:\n"
+        "شهر:\n"
+        "استان:\n"
+        "جنسیت:\n"
+        "گرایش:\n"
+        "بیوگرافی:\n"
+        "مهارت ها:\n"
+        "علاقه مندی ها:\n"
+        "تعداد لایک ها:\n"
+        "عکس پروفایل:"
+    )
+    if 'is_likes_on' not in context.user_data:
+        context.user_data['is_likes_on'] = True
+
+    if context.user_data['is_likes_on']:
+        await ReplyMessage(update, text, inline_keyboards['my_profile']['main_keyboard_likes_on'])
+    else:
+        await ReplyMessage(update, text, inline_keyboards['my_profile']['main_keyboard_likes_off'])
+    return PROFILE
+
+
+async def ProfileEditCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    await query.answer()
+    return PROFILE
+
+
+async def ProfileContactsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text('لیست مخاطبین',
+                                  reply_markup=inline_keyboards['my_profile']['contacts_keyboard'])  # TODO
+    return PROFILE_CONTACTS
+
+
+async def ProfileLikersCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text('لیست لایک کننده ها:',
+                                  reply_markup=inline_keyboards['my_profile']['likers_keyboard'])  # TODO
+    return PROFILE_LIKERS
+
+
+async def ProfileBlocksCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text('لیست مسدودی ها:',
+                                  reply_markup=inline_keyboards['my_profile']['blocks_keyboard'])  # TODO
+    return PROFILE_BLOCKS
+
+
+async def ProfileNumberOfLikesOnOff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    if context.user_data['is_likes_on']:
+        await query.answer(text='اکنون تعداد افرادی که لایک ـتان کرده اند برای بقیه نشان داده نمی شود ❌',
+                           show_alert=True)
+        await query.edit_message_reply_markup(reply_markup=inline_keyboards['my_profile']['main_keyboard_likes_off'])
+        context.user_data['is_likes_on'] = False
+    else:
+        await query.answer(text='اکنون تعداد افرادی که لایک ـتان کرده اند برای بقیه نشان داده می شود ✅',
+                           show_alert=True)
+        await query.edit_message_reply_markup(reply_markup=inline_keyboards['my_profile']['main_keyboard_likes_on'])
+        context.user_data['is_likes_on'] = True
+    return PROFILE
+
+
+async def BackToProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    text = (
+        "اسم:\n"
+        "سن:\n"
+        "شهر:\n"
+        "استان:\n"
+        "جنسیت:\n"
+        "گرایش:\n"
+        "بیوگرافی:\n"
+        "مهارت ها:\n"
+        "علاقه مندی ها:\n"
+        "تعداد لایک ها:\n"
+        "عکس پروفایل:"
+    )
+
+    query = update.callback_query
+    await query.answer()
+
+    if context.user_data['is_likes_on']:
+        await query.edit_message_text(text=text, reply_markup=inline_keyboards['my_profile']['main_keyboard_likes_on'])
+    else:
+        await query.edit_message_text(text=text, reply_markup=inline_keyboards['my_profile']['main_keyboard_likes_off'])
+
+    return PROFILE
