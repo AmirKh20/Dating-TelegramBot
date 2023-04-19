@@ -43,7 +43,9 @@ conversations = {
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,
             END: END,
-        }
+        },
+        persistent=True,
+        name='hamsan-gozini_conversation'
     ),
 
     'Profile': ConversationHandler(
@@ -72,7 +74,9 @@ conversations = {
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,
             END: END,
-        }
+        },
+        persistent=True,
+        name='profile_conversation'
     )
 }
 
@@ -87,5 +91,7 @@ conversations['Starting'] = ConversationHandler(
         CONSULTATION_STATE: [messages['Consultation']['Therapist']],
     },
     fallbacks=[messages['Main-Menu'],
-               commands['Main-Menu']]
+               commands['Main-Menu']],
+    persistent=True,
+    name='start_conversation'
 )

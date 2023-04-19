@@ -13,7 +13,7 @@ import logging
 from os import getenv
 
 from dotenv import load_dotenv
-from telegram.ext import ApplicationBuilder
+from telegram.ext import ApplicationBuilder, PicklePersistence
 
 import handlers
 
@@ -30,7 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    persistence = PicklePersistence(filepath='bot_persistence')
+    application = ApplicationBuilder().token(BOT_TOKEN).persistence(persistence).build()
 
     application.add_handler(handlers.conversations['Starting'])
     application.add_handler(handlers.commands['Help'])
