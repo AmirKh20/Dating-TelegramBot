@@ -36,7 +36,8 @@ conversations = {
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
-            PROVINCES: [CallbackQueryHandler(HamsanGoziniProvincesCallback)],
+            PROVINCES: [CallbackQueryHandler(HamsanGoziniProvincesCallback,
+                                             pattern=lambda data: data in GetProvinceNames())],
         },
         fallbacks=[commands['Main-Menu'],
                    commands['Start']],
