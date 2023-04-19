@@ -67,7 +67,8 @@ conversations = {
             ],
         },
         fallbacks=[commands['Main-Menu'],
-                   commands['Start']],
+                   commands['Start'],
+                   messages['Profile']],
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,
             END: END,
