@@ -7,6 +7,7 @@ CHANNEL_USERNAME: username of the channel which users should be subscribed into 
 LOG_FILENAME: DEFAULT: bot.log. The filename of the log file which the logs are written into
 PROVINCES_FILE: DEFAULT: provinces_cities.json. Json file containing provinces
 WEBSITE_URL: the url of the website when clicking on profile edit
+FINANCIAL_CHARGE_URL: the url for financial charge button
 """
 
 import logging

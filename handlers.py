@@ -78,6 +78,7 @@ conversations = {
         name='hamsan-gozini_conversation'
     ),
 
+    # Conversation handler for پروفایل button
     'Profile': ConversationHandler(
         entry_points=[messages['Profile']],
         states={
@@ -109,6 +110,7 @@ conversations = {
         name='profile_conversation'
     ),
 
+    # Conversation handler for مالی button
     'Financial': ConversationHandler(
         entry_points=[messages['Financial']['Menu']],
         states={

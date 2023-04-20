@@ -11,16 +11,19 @@ from utils import GetProvinceNamesInlineSequence, WEBSITE_URL, FINANCIAL_CHARGE_
 
 button_keyboards = {
     'no_keyboard': ReplyKeyboardRemove(),
+
     'default_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('همسان گزینی')],
         [KeyboardButton('پروفایل'), KeyboardButton('مالی'), KeyboardButton('مشاوره')],
         [KeyboardButton('راهنما'), KeyboardButton('زیر مجموعه گیری')],
         [KeyboardButton('پشتیبانی'), KeyboardButton('درباره ما')]
     ]),
+
     'consultation_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('چت بات'), KeyboardButton('روانشناس')],
         [KeyboardButton('پرسش و پاسخ'), KeyboardButton('بازگشت به منوی اصلی')]
     ]),
+
     'financial_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('موجودی'), KeyboardButton('خرید پلن')],
         [KeyboardButton('دریافت وجه'), KeyboardButton('تبدیل')],
@@ -33,6 +36,7 @@ inline_keyboards = {
     'hamsan_gozini_keyboard': {
         'provinces': InlineKeyboardMarkup(GetProvinceNamesInlineSequence())
     },
+
     'my_profile': {
         'main_keyboard_likes_on': InlineKeyboardMarkup([
             [InlineKeyboardButton('ویرایش پروفایل', callback_data='profile_edit', url=WEBSITE_URL)],
@@ -43,6 +47,7 @@ inline_keyboards = {
             [InlineKeyboardButton('لیست مسدودی ها', callback_data='blocks'),
              InlineKeyboardButton('فعال/غیر فعال لایک ✅', callback_data='on_off_number_likes')]
         ]),
+
         'main_keyboard_likes_off': InlineKeyboardMarkup([
             [InlineKeyboardButton('ویرایش پروفایل', callback_data='profile_edit', url=WEBSITE_URL)],
 
@@ -52,16 +57,20 @@ inline_keyboards = {
             [InlineKeyboardButton('لیست مسدودی ها', callback_data='blocks'),
              InlineKeyboardButton('فعال/غیرفعال لایک ❌', callback_data='on_off_number_likes')]
         ]),
+
         'contacts_keyboard': InlineKeyboardMarkup([
             [InlineKeyboardButton('بازگشت', callback_data='back_to_profile')]
         ]),
+
         'likers_keyboard': InlineKeyboardMarkup([
             [InlineKeyboardButton('بازگشت', callback_data='back_to_profile')]
         ]),
+
         'blocks_keyboard': InlineKeyboardMarkup([
             [InlineKeyboardButton('بازگشت', callback_data='back_to_profile')]
         ]),
     },
+
     'financial': {
         'changes_keyboard': InlineKeyboardMarkup([
             [InlineKeyboardButton('الماس به سکه', callback_data='gems_to_coins'),
@@ -88,6 +97,7 @@ inline_keyboards = {
                                   callback_data='gold',
                                   url='google.com')],
         ]),
+
         'charge': InlineKeyboardMarkup([
             [InlineKeyboardButton('پرداخت',
                                   callback_data='pay',

@@ -102,6 +102,9 @@ async def HamsanGoziniProvincesCallback(update: Update, context: ContextTypes.DE
 
 
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when پروفایل is sent. It's the entry point of the profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -130,6 +133,9 @@ async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def ProfileEditCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when ویرایش پروفایل is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -140,6 +146,9 @@ async def ProfileEditCallback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def ProfileContactsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when مخاطبین is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -153,6 +162,9 @@ async def ProfileContactsCallback(update: Update, context: ContextTypes.DEFAULT_
 
 
 async def ProfileLikersCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when لایک کننده ها is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -166,6 +178,9 @@ async def ProfileLikersCallback(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def ProfileBlocksCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when لیست مسدودی ها is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -179,6 +194,9 @@ async def ProfileBlocksCallback(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def ProfileNumberOfLikesOnOff(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when فعال/غیر فعال کردن لایک is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -202,6 +220,9 @@ async def ProfileNumberOfLikesOnOff(update: Update, context: ContextTypes.DEFAUL
 
 
 async def BackToProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when بازگشت is sent in profile conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -231,14 +252,21 @@ async def BackToProfileCallback(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 async def FinancialEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when مالی is sent. It goes into financial conversation handler.
+    """
     await ReplyMessage(update, 'یک گزینه را انتخاب کنید:', reply_keyboard_markup=button_keyboards['financial_keyboard'])
 
     if not await CheckSubs(update, context):
         return END
+
     return FINANCIAL
 
 
 async def FinancialBuyPlanCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when خرید پلن is sent in financial conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -254,6 +282,9 @@ async def FinancialBuyPlanCallback(update: Update, context: ContextTypes.DEFAULT
 
 
 async def FinancialBalanceCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when موجودی is sent in financial conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -270,6 +301,9 @@ async def FinancialBalanceCallback(update: Update, context: ContextTypes.DEFAULT
 
 
 async def FinancialChangesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل is sent in financial conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -281,6 +315,9 @@ async def FinancialChangesCallback(update: Update, context: ContextTypes.DEFAULT
 
 
 async def FinancialChangesGemsToCoinsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل الماس به سکه is clicked.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -294,6 +331,9 @@ async def FinancialChangesGemsToCoinsCallback(update: Update, context: ContextTy
 
 
 async def FinancialChangesGemsToCoinsReadGemsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل الماس به سکه has been clicked. And it reads the user input for how many gems.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -308,6 +348,9 @@ async def FinancialChangesGemsToCoinsReadGemsCallback(update: Update, context: C
 
 
 async def FinancialChangesCoinsToGemsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل سکه به الماس is clicked.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -321,6 +364,9 @@ async def FinancialChangesCoinsToGemsCallback(update: Update, context: ContextTy
 
 
 async def FinancialChangesCoinsToGemsReadCoinsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل سکه به الماس has been clicked. And it reads the user input for how many coins.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -335,6 +381,9 @@ async def FinancialChangesCoinsToGemsReadCoinsCallback(update: Update, context: 
 
 
 async def FinancialChangesGiftsToCoinsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل گیفت به سکه is clicked.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -348,6 +397,9 @@ async def FinancialChangesGiftsToCoinsCallback(update: Update, context: ContextT
 
 
 async def FinancialChangesGiftsToCoinsReadGiftsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل گیفت به سکه has been clicked. And it reads the user input for the inputted gift.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -362,6 +414,9 @@ async def FinancialChangesGiftsToCoinsReadGiftsCallback(update: Update, context:
 
 
 async def FinancialChangesGiftsToGemsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل گیفت به الماس is clicked.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -375,6 +430,9 @@ async def FinancialChangesGiftsToGemsCallback(update: Update, context: ContextTy
 
 
 async def FinancialChangesGiftsToGemsReadGiftsCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when تبدیل گیفت به الماس has been clicked. And it reads the user input for the inputted gift.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -389,6 +447,9 @@ async def FinancialChangesGiftsToGemsReadGiftsCallback(update: Update, context: 
 
 
 async def FinancialReceiveMoneyCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when دریافت وجه is sent in the financial conversation handler.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -399,6 +460,9 @@ async def FinancialReceiveMoneyCallback(update: Update, context: ContextTypes.DE
 
 
 async def FinancialReceiveMoneyCallbackQuery(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when برداشت وجه is clicked and it wants the user's card info.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -412,6 +476,9 @@ async def FinancialReceiveMoneyCallbackQuery(update: Update, context: ContextTyp
 
 
 async def FinancialReceiveMoneyEnterCardCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when برداشت وجه has been clicked and it reads the user's card info.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -426,6 +493,10 @@ async def FinancialReceiveMoneyEnterCardCallback(update: Update, context: Contex
 
 
 async def FinancialChargeCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when شارژ سکه و الماس has been clicked and the user went to the web app for this button.
+    The bot reads the gems and coins from web app and ask the user to pay.
+    """
     if not await CheckSubs(update, context):
         return END
 
