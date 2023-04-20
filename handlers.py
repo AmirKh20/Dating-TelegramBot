@@ -14,19 +14,48 @@ not_edited_messages_filter = ~filters.UpdateType.EDITED_MESSAGE
 # Command Handlers that runs the callback function when ever /command is sent
 commands = {
     'Main-Menu': CommandHandler('main_menu', MainMenuCallback, filters=not_edited_messages_filter),
+
     'Help': CommandHandler('help', HelpCallback, filters=not_edited_messages_filter),
+
     'Start': CommandHandler('start', StartCallback, filters=not_edited_messages_filter),
 }
 
 # Message handlers that run the callback function when ever the message contains the filters
 messages = {
     'Main-Menu': MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), MainMenuCallback),
+
     'Consultation': {
         'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationCallback),
         'Therapist': MessageHandler(filters.Regex('^روانشناس$'), TherapistCallback),
     },
+
     'Hamsan-Gozini': MessageHandler(filters.Regex('^همسان گزینی$'), HamsanGoziniEntryCallback),
+
     'Profile': MessageHandler(filters.Regex('^پروفایل$'), ProfileEntryCallback),
+
+    'Financial': {
+        'Menu': MessageHandler(filters.Regex('^مالی$'), FinancialEntryCallback),
+        'Buy-Plan': MessageHandler(filters.Regex('^خرید پلن$'), FinancialBuyPlanCallback),
+        'Balance': MessageHandler(filters.Regex('^موجودی$'), FinancialBalanceCallback),
+        'Changes': {
+            'Menu': MessageHandler(filters.Regex('^تبدیل$'), FinancialChangesCallback),
+            'Gems-To-Coins': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
+                                            FinancialChangesGemsToCoinsReadGemsCallback),
+            'Coins-To-Gems': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
+                                            FinancialChangesCoinsToGemsReadCoinsCallback),
+            'Gifts-To-Coins': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
+                                             FinancialChangesGiftsToCoinsReadGiftsCallback),
+            'Gifts-To-Gems': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
+                                            FinancialChangesGiftsToGemsReadGiftsCallback)
+        },
+        'Receive-Money': {
+            'Menu': MessageHandler(filters.Regex('^دریافت وجه$'), FinancialReceiveMoneyCallback),
+            'Enter-Card': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
+                                         FinancialReceiveMoneyEnterCardCallback)
+        },
+        'Charge': MessageHandler(filters.StatusUpdate.WEB_APP_DATA,
+                                 FinancialChargeCallback),
+    },
 }
 
 # Conversation handlers that modify the workflow of the bot
@@ -78,6 +107,50 @@ conversations = {
         },
         persistent=True,
         name='profile_conversation'
+    ),
+
+    'Financial': ConversationHandler(
+        entry_points=[messages['Financial']['Menu']],
+        states={
+            FINANCIAL: [messages['Financial']['Buy-Plan'],
+                        messages['Financial']['Balance'],
+                        messages['Financial']['Changes']['Menu'],
+                        messages['Financial']['Receive-Money']['Menu'],
+                        messages['Financial']['Charge']],
+
+            FINANCIAL_CHANGES: [CallbackQueryHandler(pattern='^gems_to_coins$',
+                                                     callback=FinancialChangesGemsToCoinsCallback),
+                                CallbackQueryHandler(pattern='^coins_to_gems$',
+                                                     callback=FinancialChangesCoinsToGemsCallback),
+                                CallbackQueryHandler(pattern='^gifts_to_coins$',
+                                                     callback=FinancialChangesGiftsToCoinsCallback),
+                                CallbackQueryHandler(pattern='^gifts_to_gems$',
+                                                     callback=FinancialChangesGiftsToGemsCallback)],
+
+            FINANCIAL_CHANGES_GEMS_TO_COINS: [messages['Financial']['Changes']['Gems-To-Coins']],
+            FINANCIAL_CHANGES_COINS_TO_GEMS: [messages['Financial']['Changes']['Coins-To-Gems']],
+            FINANCIAL_CHANGES_GIFTS_TO_COINS: [messages['Financial']['Changes']['Gifts-To-Coins']],
+            FINANCIAL_CHANGES_GIFTS_TO_GEMS: [messages['Financial']['Changes']['Gifts-To-Gems']],
+
+            FINANCIAL_RECEIVE_MONEY: [CallbackQueryHandler(pattern='^receive-money$',
+                                                           callback=FinancialReceiveMoneyCallbackQuery)],
+
+            FINANCIAL_RECEIVE_MONEY_ENTER_CARD: [messages['Financial']['Receive-Money']['Enter-Card']],
+        },
+        fallbacks=[commands['Main-Menu'],
+                   commands['Start'],
+                   messages['Main-Menu'],
+                   messages['Financial']['Buy-Plan'],
+                   messages['Financial']['Balance'],
+                   messages['Financial']['Changes']['Menu'],
+                   messages['Financial']['Receive-Money']['Menu'],
+                   messages['Financial']['Charge']],
+        map_to_parent={
+            MAIN_MENU_STATE: MAIN_MENU_STATE,
+            END: END,
+        },
+        persistent=True,
+        name='financial_conversation'
     )
 }
 
@@ -88,7 +161,8 @@ conversations['Starting'] = ConversationHandler(
     states={
         MAIN_MENU_STATE: [messages['Consultation']['Menu'],
                           conversations['Hamsan-Gozini'],
-                          conversations['Profile']],
+                          conversations['Profile'],
+                          conversations['Financial']],
         CONSULTATION_STATE: [messages['Consultation']['Therapist']],
     },
     fallbacks=[messages['Main-Menu'],
