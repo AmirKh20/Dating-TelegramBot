@@ -160,6 +160,7 @@ conversations = {
         name='financial_conversation'
     ),
 
+    # Conversation handler for مشاوره button.
     'Consultation': ConversationHandler(
         entry_points=[messages['Consultation']['Menu']],
         states={
@@ -186,12 +187,6 @@ conversations = {
     ),
 }
 
-accept_callback_query_handler = CallbackQueryHandler(pattern='^accept_question$',
-                                                     callback=ConsultationQAAcceptQuestionCallback)
-
-reject_callback_query_handler = CallbackQueryHandler(pattern='^reject_question$',
-                                                     callback=ConsultationQARejectQuestionCallback)
-
 # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
 conversations['Starting'] = ConversationHandler(
     entry_points=[commands['Start'],
@@ -208,3 +203,11 @@ conversations['Starting'] = ConversationHandler(
     persistent=True,
     name='start_conversation'
 )
+
+# Accept Question handler. This handler only works in the QA Group.
+accept_callback_query_handler = CallbackQueryHandler(pattern='^accept_question$',
+                                                     callback=ConsultationQAAcceptQuestionCallback)
+
+# Reject Question handler. This handler only works in the QA Group.
+reject_callback_query_handler = CallbackQueryHandler(pattern='^reject_question$',
+                                                     callback=ConsultationQARejectQuestionCallback)

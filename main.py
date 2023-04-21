@@ -39,6 +39,8 @@ def main():
     application.add_handler(handlers.conversations['Starting'])
     application.add_handler(handlers.commands['Help'])
     application.add_handler(handlers.messages['Main-Menu'])
+
+    # Handlers for accepting/rejecting the user's question in the QA Group
     application.add_handler(handlers.accept_callback_query_handler)
     application.add_handler(handlers.reject_callback_query_handler)
 
