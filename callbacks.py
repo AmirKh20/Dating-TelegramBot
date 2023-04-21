@@ -4,27 +4,36 @@ from telegram.ext import ConversationHandler
 from keyboard_buttons import button_keyboards, inline_keyboards
 from utils import *
 
+# States in the conversation handlers
+
 MAIN_MENU_STATE = 0
 
 PROVINCES = 1
 
-PROFILE, PROFILE_CONTACTS, PROFILE_LIKERS, PROFILE_BLOCKS = range(2, 6)
+(PROFILE,
+ PROFILE_CONTACTS,
+ PROFILE_LIKERS,
+ PROFILE_BLOCKS
+ ) = range(2, 6)
 
 FINANCIAL = 6
-(
-    FINANCIAL_CHANGES,
-    FINANCIAL_CHANGES_GEMS_TO_COINS,
-    FINANCIAL_CHANGES_COINS_TO_GEMS,
-    FINANCIAL_CHANGES_GIFTS_TO_COINS,
-    FINANCIAL_CHANGES_GIFTS_TO_GEMS
-) = range(7, 12)
-FINANCIAL_RECEIVE_MONEY, FINANCIAL_RECEIVE_MONEY_ENTER_CARD = range(12, 14)
+
+(FINANCIAL_CHANGES,
+ FINANCIAL_CHANGES_GEMS_TO_COINS,
+ FINANCIAL_CHANGES_COINS_TO_GEMS,
+ FINANCIAL_CHANGES_GIFTS_TO_COINS,
+ FINANCIAL_CHANGES_GIFTS_TO_GEMS
+ ) = range(7, 12)
+
+(FINANCIAL_RECEIVE_MONEY,
+ FINANCIAL_RECEIVE_MONEY_ENTER_CARD
+ ) = range(12, 14)
 
 CONSULTATION = 14
-(
-    CONSULTATION_QA,
-    CONSULTATION_QA_ENTER_QUESTION,
-) = range(15, 17)
+
+(CONSULTATION_QA,
+ CONSULTATION_QA_ENTER_QUESTION,
+ ) = range(15, 17)
 
 END = ConversationHandler.END
 
@@ -53,7 +62,7 @@ async def HelpCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def ConsultationEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when مشاوره is sent. The consultation keyboard is shown.
+    Runs when مشاوره is sent.
     """
     await ReplyMessage(update, 'چه نوع مشاوره می خواهید؟', button_keyboards['consultation_keyboard'])
     await CheckSubs(update, context)
@@ -62,7 +71,7 @@ async def ConsultationEntryCallback(update: Update, context: ContextTypes.DEFAUL
 
 async def ConsultationTherapistCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    TODO
+    Runs when روانشناس is sent.
     """
     await ReplyMessage(update, 'روانشناس', button_keyboards['no_keyboard'])
     await CheckSubs(update, context)
@@ -70,6 +79,9 @@ async def ConsultationTherapistCallback(update: Update, context: ContextTypes.DE
 
 
 async def ConsultationQACallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when پرسش و پاسخ is sent.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -83,6 +95,9 @@ async def ConsultationQACallback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def ConsultationQAEnterQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when after the user has sent their question.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -101,6 +116,9 @@ async def ConsultationQAEnterQuestionCallback(update: Update, context: ContextTy
 
 
 async def ConsultationQASendQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user has clicked on تایید inline button after they sent their question.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -119,6 +137,7 @@ async def ConsultationQASendQuestionCallback(update: Update, context: ContextTyp
     )
     await query.edit_message_text(text=message_text_to_user, reply_markup=None)
 
+    # Message that is sent to the QA Group for the admins to accept or reject:
     message_text_to_group = (
         f"user {update.effective_user.id}\n"
         "سوال:\n"
@@ -134,6 +153,9 @@ async def ConsultationQASendQuestionCallback(update: Update, context: ContextTyp
 
 
 async def ConsultationQADontSendQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user has clicked on نفرست inline button after they sent their question.
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -159,18 +181,25 @@ async def ConsultationQADontSendQuestionCallback(update: Update, context: Contex
 
 
 async def ConsultationQAAcceptQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Runs when one of the admins in QA Group clicks on تایید inline button for a user's question
+    """
     query = update.callback_query
     await query.answer()
 
-    question = ' '.join(query.message.text.split(':', maxsplit=1)[1:])
+    # The ID of the user that sent the question
     user_id = query.message.text.split()[1]
+    # The question of the user
+    question = query.message.text.split(':', maxsplit=1)[1]
 
+    # The text that is sent to QA_CHANNEL
     channel_text = (
         "سوال:\n"
         f"{question}\n"
     )
     channel_message = await context.bot.send_message(chat_id=QA_CHANNEL, text=channel_text)
 
+    # The message for QA Group
     accepting_message_to_group = (
         "سوال با موفقیت به کانال فرستاده شد\n"
         "لینک پست:\n"
@@ -178,6 +207,7 @@ async def ConsultationQAAcceptQuestionCallback(update: Update, context: ContextT
     )
     await query.edit_message_text(text=accepting_message_to_group, reply_markup=None)
 
+    # The message for the user that has sent the question
     accepting_message_to_user = (
         "پیام شما با موفقیت تایید شد ✅\n"
         "لینک پیام در کانال:\n"
@@ -187,12 +217,18 @@ async def ConsultationQAAcceptQuestionCallback(update: Update, context: ContextT
 
 
 async def ConsultationQARejectQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Runs when one of the admins in QA Group clicks on رد inline button for a user's question
+    """
     query = update.callback_query
     await query.answer()
 
-    question = ' '.join(query.message.text.split(':', maxsplit=1)[1:])
+    # The ID of the user that sent the question
     user_id = query.message.text.split()[1]
+    # The question of the user
+    question = query.message.text.split(':', maxsplit=1)[1]
 
+    # The message for QA Group
     rejecting_message_to_group = (
         "سوال:\n"
         f"{question}\n"
@@ -200,6 +236,7 @@ async def ConsultationQARejectQuestionCallback(update: Update, context: ContextT
     )
     await query.edit_message_text(text=rejecting_message_to_group, reply_markup=None)
 
+    # The message for the user that has sent the question
     rejecting_message_to_user = (
         "سوال:\n"
         f"{question}\n"
