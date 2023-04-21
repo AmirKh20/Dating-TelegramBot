@@ -111,6 +111,7 @@ inline_keyboards = {
                 [InlineKeyboardButton('تایید ✅', callback_data='send_question'),
                  InlineKeyboardButton('نفرست ❌', callback_data='dont_send_question')]
             ]),
+            # TODO: Add block inline button, And reason inline button
             'accept_question': InlineKeyboardMarkup([
                 [InlineKeyboardButton('تایید ✅', callback_data='accept_question'),
                  InlineKeyboardButton('رد ❌', callback_data='reject_question')]

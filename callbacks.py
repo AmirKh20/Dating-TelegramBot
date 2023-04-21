@@ -118,6 +118,7 @@ async def ConsultationQAEnterQuestionCallback(update: Update, context: ContextTy
 async def ConsultationQASendQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Runs when the user has clicked on تایید inline button after they sent their question.
+    TODO: Check if the user is blocked.
     """
     if not await CheckSubs(update, context):
         return END
