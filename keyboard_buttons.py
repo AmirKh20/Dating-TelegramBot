@@ -21,7 +21,7 @@ button_keyboards = {
 
     'consultation_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('چت بات'), KeyboardButton('روانشناس')],
-        [KeyboardButton('پرسش و پاسخ'), KeyboardButton('بازگشت به منوی اصلی')]
+        [KeyboardButton('بازگشت به منوی اصلی'), KeyboardButton('پرسش و پاسخ')]
     ]),
 
     'financial_keyboard': ReplyKeyboardMarkup([
@@ -105,4 +105,16 @@ inline_keyboards = {
         ]),
 
     },
+    'consultation': {
+        'QA': {
+            'enter-question': InlineKeyboardMarkup([
+                [InlineKeyboardButton('تایید ✅', callback_data='send_question'),
+                 InlineKeyboardButton('نفرست ❌', callback_data='dont_send_question')]
+            ]),
+            'accept_question': InlineKeyboardMarkup([
+                [InlineKeyboardButton('تایید ✅', callback_data='accept_question'),
+                 InlineKeyboardButton('رد ❌', callback_data='reject_question')]
+            ])
+        }
+    }
 }

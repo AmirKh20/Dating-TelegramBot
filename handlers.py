@@ -25,8 +25,13 @@ messages = {
     'Main-Menu': MessageHandler(filters.Regex('^بازگشت به منوی اصلی$'), MainMenuCallback),
 
     'Consultation': {
-        'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationCallback),
-        'Therapist': MessageHandler(filters.Regex('^روانشناس$'), TherapistCallback),
+        'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationEntryCallback),
+        'Therapist': MessageHandler(filters.Regex('^روانشناس$'), ConsultationTherapistCallback),
+        'QA': {
+            'Menu': MessageHandler(filters.Regex('^پرسش و پاسخ$'), ConsultationQACallback),
+            'Enter-Question': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
+                                             ConsultationQAEnterQuestionCallback),
+        }
     },
 
     'Hamsan-Gozini': MessageHandler(filters.Regex('^همسان گزینی$'), HamsanGoziniEntryCallback),
@@ -153,19 +158,50 @@ conversations = {
         },
         persistent=True,
         name='financial_conversation'
-    )
+    ),
+
+    'Consultation': ConversationHandler(
+        entry_points=[messages['Consultation']['Menu']],
+        states={
+            CONSULTATION: [messages['Consultation']['Therapist'],
+                           messages['Consultation']['QA']['Menu']],
+
+            CONSULTATION_QA: [messages['Consultation']['QA']['Enter-Question']],
+
+            CONSULTATION_QA_ENTER_QUESTION: [CallbackQueryHandler(pattern='^send_question$',
+                                                                  callback=ConsultationQASendQuestionCallback),
+                                             CallbackQueryHandler(pattern='^dont_send_question$',
+                                                                  callback=ConsultationQADontSendQuestionCallback)],
+        },
+        fallbacks=[commands['Main-Menu'],
+                   commands['Start'],
+                   messages['Main-Menu'],
+                   ],
+        map_to_parent={
+            MAIN_MENU_STATE: MAIN_MENU_STATE,
+            END: END,
+        },
+        persistent=True,
+        name='consultation_conversation'
+    ),
 }
+
+accept_callback_query_handler = CallbackQueryHandler(pattern='^accept_question$',
+                                                     callback=ConsultationQAAcceptQuestionCallback)
+
+reject_callback_query_handler = CallbackQueryHandler(pattern='^reject_question$',
+                                                     callback=ConsultationQARejectQuestionCallback)
 
 # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
 conversations['Starting'] = ConversationHandler(
     entry_points=[commands['Start'],
                   commands['Main-Menu']],
     states={
-        MAIN_MENU_STATE: [messages['Consultation']['Menu'],
-                          conversations['Hamsan-Gozini'],
+        MAIN_MENU_STATE: [conversations['Hamsan-Gozini'],
                           conversations['Profile'],
-                          conversations['Financial']],
-        CONSULTATION_STATE: [messages['Consultation']['Therapist']],
+                          conversations['Financial'],
+                          conversations['Consultation']],
+
     },
     fallbacks=[messages['Main-Menu'],
                commands['Main-Menu']],

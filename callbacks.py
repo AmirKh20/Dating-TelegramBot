@@ -4,20 +4,29 @@ from telegram.ext import ConversationHandler
 from keyboard_buttons import button_keyboards, inline_keyboards
 from utils import *
 
-MAIN_MENU_STATE, CONSULTATION_STATE = range(2)
-END = ConversationHandler.END
-PROVINCES = 2
-PROFILE, PROFILE_CONTACTS, PROFILE_LIKERS, PROFILE_BLOCKS = range(3, 7)
+MAIN_MENU_STATE = 0
 
-FINANCIAL = 7
+PROVINCES = 1
+
+PROFILE, PROFILE_CONTACTS, PROFILE_LIKERS, PROFILE_BLOCKS = range(2, 6)
+
+FINANCIAL = 6
 (
     FINANCIAL_CHANGES,
     FINANCIAL_CHANGES_GEMS_TO_COINS,
     FINANCIAL_CHANGES_COINS_TO_GEMS,
     FINANCIAL_CHANGES_GIFTS_TO_COINS,
     FINANCIAL_CHANGES_GIFTS_TO_GEMS
-) = range(8, 13)
-FINANCIAL_RECEIVE_MONEY, FINANCIAL_RECEIVE_MONEY_ENTER_CARD = range(13, 15)
+) = range(7, 12)
+FINANCIAL_RECEIVE_MONEY, FINANCIAL_RECEIVE_MONEY_ENTER_CARD = range(12, 14)
+
+CONSULTATION = 14
+(
+    CONSULTATION_QA,
+    CONSULTATION_QA_ENTER_QUESTION,
+) = range(15, 17)
+
+END = ConversationHandler.END
 
 
 async def StartCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -42,13 +51,162 @@ async def HelpCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await SendMessage(update, context, 'این خروجی هلپ است')
 
 
-async def ConsultationCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ConsultationEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Runs when مشاوره is sent. The consultation keyboard is shown.
     """
     await ReplyMessage(update, 'چه نوع مشاوره می خواهید؟', button_keyboards['consultation_keyboard'])
     await CheckSubs(update, context)
-    return CONSULTATION_STATE
+    return CONSULTATION
+
+
+async def ConsultationTherapistCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    TODO
+    """
+    await ReplyMessage(update, 'روانشناس', button_keyboards['no_keyboard'])
+    await CheckSubs(update, context)
+    return END
+
+
+async def ConsultationQACallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    info_text = (
+        'پیام توضیحات..\n'
+        'لطفا سوال خود را بپرسید:'
+    )
+    await ReplyMessage(update, text=info_text, reply_keyboard_markup=ForceReply())
+
+    return CONSULTATION_QA
+
+
+async def ConsultationQAEnterQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    question = update.message.text
+    context.user_data['question'] = question
+
+    text = (
+        "سوال شما این است:\n"
+        f"{question}\n"
+        "آیا مطمئن هستید؟"
+    )
+    await ReplyMessage(update, text=text,
+                       reply_keyboard_markup=inline_keyboards['consultation']['QA']['enter-question'])
+
+    return CONSULTATION_QA_ENTER_QUESTION
+
+
+async def ConsultationQASendQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    question = context.user_data['question']
+
+    alert_text = (
+        "پیام شما فرستاده شد ✅ منتظر تایید سوال خود بمانید."
+    )
+    await query.answer(text=alert_text, show_alert=True)
+
+    message_text_to_user = (
+        "سوال:\n"
+        f"{question}\n"
+        "به ادمین ها فرستاده شد ✅ منتظر تایید سوال خود بمانید."
+    )
+    await query.edit_message_text(text=message_text_to_user, reply_markup=None)
+
+    message_text_to_group = (
+        f"user {update.effective_user.id}\n"
+        "سوال:\n"
+        f"{question}"
+    )
+    await context.bot.send_message(chat_id=QA_GROUP_ID, text=message_text_to_group,
+                                   reply_markup=inline_keyboards['consultation']['QA']['accept_question'])
+
+    await SendMessage(update, context, text='بازگشت',
+                      reply_markup=button_keyboards['consultation_keyboard'])
+
+    return CONSULTATION
+
+
+async def ConsultationQADontSendQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if not await CheckSubs(update, context):
+        return END
+
+    query = update.callback_query
+    question = context.user_data['question']
+
+    alert_text = (
+        "پیام شما فرستاده نشد ❌"
+    )
+    await query.answer(text=alert_text, show_alert=True)
+
+    message_text_to_user = (
+        "سوال:\n"
+        f"{question}\n"
+        "فرستاده نشد ❌"
+    )
+    await query.edit_message_text(text=message_text_to_user, reply_markup=None)
+
+    await SendMessage(update, context, text='بازگشت',
+                      reply_markup=button_keyboards['consultation_keyboard'])
+
+    return CONSULTATION
+
+
+async def ConsultationQAAcceptQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    question = ' '.join(query.message.text.split(':', maxsplit=1)[1:])
+    user_id = query.message.text.split()[1]
+
+    channel_text = (
+        "سوال:\n"
+        f"{question}\n"
+    )
+    channel_message = await context.bot.send_message(chat_id=QA_CHANNEL, text=channel_text)
+
+    accepting_message_to_group = (
+        "سوال با موفقیت به کانال فرستاده شد\n"
+        "لینک پست:\n"
+        f"https://t.me/{QA_CHANNEL[1:]}/{channel_message.message_id}"
+    )
+    await query.edit_message_text(text=accepting_message_to_group, reply_markup=None)
+
+    accepting_message_to_user = (
+        "پیام شما با موفقیت تایید شد ✅\n"
+        "لینک پیام در کانال:\n"
+        f"https://t.me/{QA_CHANNEL[1:]}/{channel_message.message_id}"
+    )
+    await context.bot.send_message(chat_id=user_id, text=accepting_message_to_user)
+
+
+async def ConsultationQARejectQuestionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    question = ' '.join(query.message.text.split(':', maxsplit=1)[1:])
+    user_id = query.message.text.split()[1]
+
+    rejecting_message_to_group = (
+        "سوال:\n"
+        f"{question}\n"
+        "رد شد ❌"
+    )
+    await query.edit_message_text(text=rejecting_message_to_group, reply_markup=None)
+
+    rejecting_message_to_user = (
+        "سوال:\n"
+        f"{question}\n"
+        "رد شد ❌\n"
+        "لطفا سوال دیگری بفرمایید"
+    )
+    await context.bot.send_message(chat_id=user_id, text=rejecting_message_to_user)
 
 
 async def MainMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -58,15 +216,6 @@ async def MainMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await ReplyMessage(update, 'منوی اصلی:', button_keyboards['default_keyboard'])
     await CheckSubs(update, context)
     return MAIN_MENU_STATE
-
-
-async def TherapistCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """
-    TODO
-    """
-    await ReplyMessage(update, 'روانشناس', button_keyboards['no_keyboard'])
-    await CheckSubs(update, context)
-    return END
 
 
 async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -201,6 +350,7 @@ async def ProfileNumberOfLikesOnOff(update: Update, context: ContextTypes.DEFAUL
         return END
 
     query = update.callback_query
+
     if context.user_data['is_likes_on']:
         await query.answer(text='اکنون تعداد افرادی که لایک ـتان کرده اند برای بقیه نشان داده نمی شود ❌',
                            show_alert=True)
@@ -208,6 +358,7 @@ async def ProfileNumberOfLikesOnOff(update: Update, context: ContextTypes.DEFAUL
         await query.edit_message_reply_markup(reply_markup=inline_keyboards['my_profile']['main_keyboard_likes_off'])
 
         context.user_data['is_likes_on'] = False
+
     else:
         await query.answer(text='اکنون تعداد افرادی که لایک ـتان کرده اند برای بقیه نشان داده می شود ✅',
                            show_alert=True)

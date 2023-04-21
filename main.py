@@ -8,6 +8,8 @@ LOG_FILENAME: DEFAULT: bot.log. The filename of the log file which the logs are 
 PROVINCES_FILE: DEFAULT: provinces_cities.json. Json file containing provinces
 WEBSITE_URL: the url of the website when clicking on profile edit
 FINANCIAL_CHARGE_URL: the url for financial charge button
+QA_GROUP_ID: chat_id for the QA group.
+QA_CHANNEL: username of the channel which questions are posted.
 """
 
 import logging
@@ -37,6 +39,8 @@ def main():
     application.add_handler(handlers.conversations['Starting'])
     application.add_handler(handlers.commands['Help'])
     application.add_handler(handlers.messages['Main-Menu'])
+    application.add_handler(handlers.accept_callback_query_handler)
+    application.add_handler(handlers.reject_callback_query_handler)
 
     application.run_polling()
 
