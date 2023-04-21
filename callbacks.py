@@ -35,6 +35,7 @@ CONSULTATION = 14
  CONSULTATION_QA_ENTER_QUESTION,
  ) = range(15, 17)
 
+SUPPORT = 17
 END = ConversationHandler.END
 
 
@@ -701,3 +702,92 @@ async def FinancialChargeCallback(update: Update, context: ContextTypes.DEFAULT_
     await ReplyMessage(update, text=text, reply_keyboard_markup=inline_keyboards['financial']['charge'])
 
     return FINANCIAL
+
+
+async def DownLineCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when زیر مجموعه گیری is sent.
+    """
+    if not await CheckSubs(update, context):
+        return END
+
+    await ReplyMessage(update, text='توضیحات زیر مجموعه های گرفته شده..')
+
+    return MAIN_MENU_STATE
+
+
+async def SupportEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when پشتیبانی is sent.
+    """
+    if not await CheckSubs(update, context):
+        return END
+
+    text = (
+        "توضیحات:\n"
+        "لطفا پیام خود را ارسال کنید:"
+    )
+    await ReplyMessage(update, text=text, reply_keyboard_markup=ForceReply())
+
+    return SUPPORT
+
+
+async def SupportEnterTicketCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function to read the user ticket
+    """
+    if not await CheckSubs(update, context):
+        return END
+
+    ticket = update.message.text
+    user_id = update.effective_user.id
+
+    message_to_support_group = (
+        f"user {user_id}\n"
+        "تیکت:\n"
+        f"{ticket}\n\n"
+        "وضعیت پاسخگویی: پاسخ داده نشده ❌"
+    )
+    await context.bot.send_message(chat_id=SUPPORT_GROUP_ID, text=message_to_support_group,
+                                   reply_markup=inline_keyboards['support']['not_answered'])
+
+    message_to_user = (
+        "تیکت شما دریافت شد. ✅\n"
+        "منتظر پاسخ بمانید."
+    )
+    await ReplyMessage(update, text=message_to_user,
+                       reply_keyboard_markup=button_keyboards['default_keyboard'])
+
+    return MAIN_MENU_STATE
+
+
+async def SupportAnswerTicketCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Callback function to answer the user's ticket in the SUPPORT_GROUP_ID chat.
+    """
+    message = update.message.reply_to_message
+
+    if message.reply_markup.inline_keyboard[0][0].callback_data == 'ticket_answered':
+        await ReplyMessage(update, text='پاسخ این تیکت از قبل فرستاده شده!')
+        return
+
+    ticket = message.text[message.text.find('تیکت:') + 6: message.text.rfind('وضعیت') - 1]
+    ticket_answer = update.message.text
+
+    user_id = message.text.split()[1]
+
+    edited_message_to_group = message.text[:-6] + "شده ✅"
+    await context.bot.edit_message_text(chat_id=SUPPORT_GROUP_ID,
+                                        message_id=message.message_id,
+                                        text=edited_message_to_group,
+                                        reply_markup=inline_keyboards['support']['answered'])
+
+    message_to_user = (
+        "تیکت:\n"
+        f"{ticket}\n"
+        "پاسخ داده شد ✅\n"
+        "پاسخ:\n"
+        f"{ticket_answer}"
+    )
+    await context.bot.send_message(chat_id=user_id,
+                                   text=message_to_user)

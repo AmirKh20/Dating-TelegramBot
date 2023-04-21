@@ -117,5 +117,13 @@ inline_keyboards = {
                  InlineKeyboardButton('رد ❌', callback_data='reject_question')]
             ])
         }
+    },
+    'support': {
+        'answered': InlineKeyboardMarkup([
+            [InlineKeyboardButton('✅', callback_data='ticket_answered')]
+        ]),
+        'not_answered': InlineKeyboardMarkup([
+            [InlineKeyboardButton('❌', callback_data='ticked_not_answered')]
+        ])
     }
 }

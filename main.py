@@ -10,6 +10,7 @@ WEBSITE_URL: the url of the website when clicking on profile edit
 FINANCIAL_CHARGE_URL: the url for financial charge button
 QA_GROUP_ID: chat_id for the QA group.
 QA_CHANNEL: username of the channel which questions are posted.
+SUPPORT_GROUP_ID: chat_id for the support group.
 """
 
 import logging
@@ -43,6 +44,9 @@ def main():
     # Handlers for accepting/rejecting the user's question in the QA Group
     application.add_handler(handlers.accept_callback_query_handler)
     application.add_handler(handlers.reject_callback_query_handler)
+
+    # Handler for answering the tickets in the Support Group
+    application.add_handler(handlers.messages['Support']['Answer-Ticket'])
 
     application.run_polling()
 

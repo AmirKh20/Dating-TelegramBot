@@ -29,6 +29,8 @@ messages = {
         'Therapist': MessageHandler(filters.Regex('^روانشناس$'), ConsultationTherapistCallback),
         'QA': {
             'Menu': MessageHandler(filters.Regex('^پرسش و پاسخ$'), ConsultationQACallback),
+
+            # Every text message that is replied to the bots' message in the bot.
             'Enter-Question': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
                                              ConsultationQAEnterQuestionCallback),
         }
@@ -55,12 +57,30 @@ messages = {
         },
         'Receive-Money': {
             'Menu': MessageHandler(filters.Regex('^دریافت وجه$'), FinancialReceiveMoneyCallback),
+
+            # Every text message that is replied to the bots' message in the bot.
             'Enter-Card': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
                                          FinancialReceiveMoneyEnterCardCallback)
         },
+        # Web app handler for charging coins and gems
         'Charge': MessageHandler(filters.StatusUpdate.WEB_APP_DATA,
                                  FinancialChargeCallback),
     },
+
+    'Down-Line': MessageHandler(filters.Regex('^زیر مجموعه گیری$'), DownLineCallback),
+
+    'Support': {
+        'Main': MessageHandler(filters.Regex('^پشتیبانی$'), SupportEntryCallback),
+
+        # Every text message that is replied to the bots' message in the bot.
+        'Enter-Ticket': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
+                                       SupportEnterTicketCallback),
+
+        # Every text message that is replied to the bots' message in the Support Group.
+        'Answer-Ticket': MessageHandler(filters.TEXT & filters.REPLY
+                                        & ~filters.COMMAND & filters.Chat(chat_id=SUPPORT_GROUP_ID),
+                                        SupportAnswerTicketCallback)
+    }
 }
 
 # Conversation handlers that modify the workflow of the bot
@@ -185,6 +205,22 @@ conversations = {
         persistent=True,
         name='consultation_conversation'
     ),
+
+    # Conversation handler for پشتیبانی button.
+    'Support': ConversationHandler(
+        entry_points=[messages['Support']['Main']],
+        states={
+            SUPPORT: [messages['Support']['Enter-Ticket']],
+        },
+        fallbacks=[commands['Main-Menu'],
+                   commands['Start']],
+        map_to_parent={
+            MAIN_MENU_STATE: MAIN_MENU_STATE,
+            END: END,
+        },
+        persistent=True,
+        name='support_conversation'
+    )
 }
 
 # This handler starts when `Start` or `Main-Manu` handlers is run, and it goes to different states
@@ -195,7 +231,9 @@ conversations['Starting'] = ConversationHandler(
         MAIN_MENU_STATE: [conversations['Hamsan-Gozini'],
                           conversations['Profile'],
                           conversations['Financial'],
-                          conversations['Consultation']],
+                          conversations['Consultation'],
+                          messages['Down-Line'],
+                          conversations['Support']],
 
     },
     fallbacks=[messages['Main-Menu'],
