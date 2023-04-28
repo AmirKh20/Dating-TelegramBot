@@ -243,9 +243,9 @@ conversations['Starting'] = ConversationHandler(
 )
 
 # Accept Question handler. This handler only works in the QA Group.
-accept_callback_query_handler = CallbackQueryHandler(pattern='^accept_question$',
+accept_question_query_handler = CallbackQueryHandler(pattern='^accept_question$',
                                                      callback=ConsultationQAAcceptQuestionCallback)
 
 # Reject Question handler. This handler only works in the QA Group.
-reject_callback_query_handler = CallbackQueryHandler(pattern='^reject_question$',
+reject_question_query_handler = CallbackQueryHandler(pattern='^reject_question$',
                                                      callback=ConsultationQARejectQuestionCallback)

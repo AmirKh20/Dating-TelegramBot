@@ -105,6 +105,7 @@ inline_keyboards = {
         ]),
 
     },
+
     'consultation': {
         'QA': {
             'enter-question': InlineKeyboardMarkup([
@@ -118,6 +119,7 @@ inline_keyboards = {
             ])
         }
     },
+
     'support': {
         'answered': InlineKeyboardMarkup([
             [InlineKeyboardButton('✅', callback_data='ticket_answered')]

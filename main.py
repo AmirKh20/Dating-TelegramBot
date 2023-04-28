@@ -42,8 +42,8 @@ def main():
     application.add_handler(handlers.messages['Main-Menu'])
 
     # Handlers for accepting/rejecting the user's question in the QA Group
-    application.add_handler(handlers.accept_callback_query_handler)
-    application.add_handler(handlers.reject_callback_query_handler)
+    application.add_handler(handlers.accept_question_query_handler)
+    application.add_handler(handlers.reject_question_query_handler)
 
     # Handler for answering the tickets in the Support Group
     application.add_handler(handlers.messages['Support']['Answer-Ticket'])
