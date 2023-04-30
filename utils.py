@@ -3,7 +3,8 @@ from os import getenv
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
+from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent, \
+    InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 load_dotenv()
@@ -86,21 +87,24 @@ def GetProvinceNamesInlineSequence():
 
 def GetChatRequestsGivenList(user_id):
     results = []
-    # reply_markup = InlineKeyboardMarkup([
-    #     InlineKeyboardButton()
-    # ])
+    reply_markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+        [InlineKeyboardButton('حذف از لیست و پس گرفتن درخواست', callback_data='delete_from_given_list')]
+    ])
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='امیر',
                                             input_message_content=InputTextMessageContent(
                                                 'پروفایل فرد شامل شهر و سن و عکس و ...'
-                                            )
+                                            ),
+                                            reply_markup=reply_markup
                                             )
                    )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='علی',
                                             input_message_content=InputTextMessageContent(
                                                 'پروفایل فرد شامل شهر و سن و عکس و ...'
-                                            )
+                                            ),
+                                            reply_markup=reply_markup
                                             )
                    )
 
