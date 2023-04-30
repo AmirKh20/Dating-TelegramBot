@@ -8,7 +8,7 @@ from utils import *
 
 MAIN_MENU_STATE = 0
 
-PROVINCES = 1
+HAMSAN_GOZINI_MENU = 1
 
 (PROFILE,
  PROFILE_CONTACTS,
@@ -36,6 +36,9 @@ CONSULTATION = 14
  ) = range(15, 17)
 
 SUPPORT = 17
+
+HAMSAN_GOZINI_CHAT_REQUESTS = 18
+
 END = ConversationHandler.END
 
 
@@ -265,28 +268,44 @@ async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAUL
     await SendMessage(update, context, 'چک کردن پروفایل...', button_keyboards['no_keyboard'])
     is_profile_completed = True  # TODO
 
-    if is_profile_completed:
-        await ReplyMessage(update,
-                           'استان مورد نظر را انتخاب کنید',
-                           inline_keyboards['hamsan_gozini_keyboard']['provinces'])
-        return PROVINCES
+    if not is_profile_completed:
+        await SendMessage(update, context, 'پروفایل کامل نیست')
+        return await MainMenuCallback(update, context)
 
-    await SendMessage(update, context, 'پروفایل کامل نیست')
-    return await MainMenuCallback(update, context)
+    message_text = (
+        "یک گزینه را انتخاب کنید:"
+    )
+    await ReplyMessage(update,
+                       text=message_text,
+                       reply_keyboard_markup=inline_keyboards['hamsan_gozini']['main_keyboard'])
+    return HAMSAN_GOZINI_MENU
 
 
-async def HamsanGoziniProvincesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """
-    Runs when the user has clicked on one of the provinces.
-    """
+async def HamsanGoziniChatRequestsListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if not await CheckSubs(update, context):
         return END
 
     query = update.callback_query
     await query.answer()
 
-    await query.edit_message_text('لیست کاربران')  # TODO
-    return END
+    message_text = (
+        "کدام یک از لیست ها را می خواهید؟"
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['hamsan_gozini']['chat_requests'])
+
+    return HAMSAN_GOZINI_CHAT_REQUESTS
+
+
+async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await CheckSubs(update, context):
+        return
+
+    query = update.inline_query
+
+    results = GetChatRequestsGivenList(update.effective_user.id)
+
+    await query.answer(results=results)
 
 
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

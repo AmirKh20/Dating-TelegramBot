@@ -1,8 +1,9 @@
 import json
 from os import getenv
+from uuid import uuid4
 
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton
+from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import ContextTypes
 
 load_dotenv()
@@ -81,3 +82,26 @@ def GetProvinceNamesInlineSequence():
         buttons.append([InlineKeyboardButton(names[i], callback_data=names[i])])
 
     return buttons
+
+
+def GetChatRequestsGivenList(user_id):
+    results = []
+    # reply_markup = InlineKeyboardMarkup([
+    #     InlineKeyboardButton()
+    # ])
+    results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                            title='امیر',
+                                            input_message_content=InputTextMessageContent(
+                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                            )
+                                            )
+                   )
+    results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                            title='علی',
+                                            input_message_content=InputTextMessageContent(
+                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                            )
+                                            )
+                   )
+
+    return results

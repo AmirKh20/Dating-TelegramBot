@@ -5,6 +5,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
     CallbackQueryHandler,
+    InlineQueryHandler
 )
 
 from callbacks import *
@@ -90,8 +91,8 @@ conversations = {
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
-            PROVINCES: [CallbackQueryHandler(HamsanGoziniProvincesCallback,
-                                             pattern=lambda data: data in GetProvinceNames())],
+            HAMSAN_GOZINI_MENU: [CallbackQueryHandler(pattern='^chat_requests_list$',
+                                                      callback=HamsanGoziniChatRequestsListCallback)],
         },
         fallbacks=[commands['Main-Menu'],
                    commands['Start']],
@@ -249,3 +250,6 @@ accept_question_query_handler = CallbackQueryHandler(pattern='^accept_question$'
 # Reject Question handler. This handler only works in the QA Group.
 reject_question_query_handler = CallbackQueryHandler(pattern='^reject_question$',
                                                      callback=ConsultationQARejectQuestionCallback)
+
+given_list_query_handler = InlineQueryHandler(pattern='^درخواست های داده شده:.*$',
+                                              callback=HamsanGoziniChatRequestsGivenListCallback)

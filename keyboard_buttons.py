@@ -7,7 +7,7 @@ from telegram import (
     WebAppInfo,
 )
 
-from utils import GetProvinceNamesInlineSequence, WEBSITE_URL, FINANCIAL_CHARGE_URL
+from utils import WEBSITE_URL, FINANCIAL_CHARGE_URL
 
 button_keyboards = {
     'no_keyboard': ReplyKeyboardRemove(),
@@ -33,8 +33,20 @@ button_keyboards = {
 }
 
 inline_keyboards = {
-    'hamsan_gozini_keyboard': {
-        'provinces': InlineKeyboardMarkup(GetProvinceNamesInlineSequence())
+    'hamsan_gozini': {
+        'main_keyboard': InlineKeyboardMarkup([
+            [InlineKeyboardButton('جستجوی کاربران', callback_data='search_users')],
+            [InlineKeyboardButton('لیست درخواست ها', callback_data='chat_requests_list')]
+        ]),
+
+        'chat_requests': InlineKeyboardMarkup([
+            [InlineKeyboardButton('درخواست های چت داده شده',
+                                  switch_inline_query_current_chat='درخواست های داده شده:'),
+             InlineKeyboardButton('درخواست های چت گرفته شده',
+                                  switch_inline_query_current_chat='درخواست های گرفته شده:')],
+
+            [InlineKeyboardButton('بازگشت', callback_data='back')]
+        ])
     },
 
     'my_profile': {
