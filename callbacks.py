@@ -321,6 +321,17 @@ async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: Con
     await query.answer(results=results)
 
 
+async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await CheckSubs(update, context):
+        return
+
+    query = update.inline_query
+
+    results = GetChatRequestsGottenList(update.effective_user.id)
+
+    await query.answer(results=results)
+
+
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Runs when پروفایل is sent. It's the entry point of the profile conversation handler.

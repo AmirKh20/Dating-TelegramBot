@@ -48,7 +48,8 @@ def main():
     # Handler for answering the tickets in the Support Group
     application.add_handler(handlers.messages['Support']['Answer-Ticket'])
 
-    application.add_handler(handlers.given_list_query_handler)
+    application.add_handler(handlers.given_list_inline_query_handler)
+    application.add_handler(handlers.gotten_list_inline_query_handler)
 
     application.run_polling()
 

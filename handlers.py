@@ -253,5 +253,8 @@ accept_question_query_handler = CallbackQueryHandler(pattern='^accept_question$'
 reject_question_query_handler = CallbackQueryHandler(pattern='^reject_question$',
                                                      callback=ConsultationQARejectQuestionCallback)
 
-given_list_query_handler = InlineQueryHandler(pattern='^درخواست های داده شده:.*$',
-                                              callback=HamsanGoziniChatRequestsGivenListCallback)
+given_list_inline_query_handler = InlineQueryHandler(pattern='^درخواست های داده شده:.*$',
+                                                     callback=HamsanGoziniChatRequestsGivenListCallback)
+
+gotten_list_inline_query_handler = InlineQueryHandler(pattern='^درخواست های گرفته شده:.*$',
+                                                      callback=HamsanGoziniChatRequestsGottenListCallback)

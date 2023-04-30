@@ -109,3 +109,31 @@ def GetChatRequestsGivenList(user_id):
                    )
 
     return results
+
+
+def GetChatRequestsGottenList(user_id):
+    results = []
+    reply_markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+
+        [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
+         InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
+    ])
+    results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                            title='امیر',
+                                            input_message_content=InputTextMessageContent(
+                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                            ),
+                                            reply_markup=reply_markup
+                                            )
+                   )
+    results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                            title='علی',
+                                            input_message_content=InputTextMessageContent(
+                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                            ),
+                                            reply_markup=reply_markup
+                                            )
+                   )
+
+    return results
