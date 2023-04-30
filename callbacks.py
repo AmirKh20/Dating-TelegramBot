@@ -297,6 +297,19 @@ async def HamsanGoziniChatRequestsListCallback(update: Update, context: ContextT
     return HAMSAN_GOZINI_CHAT_REQUESTS
 
 
+async def HamsanGoziniGoBackMenu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    message_text = (
+        "یک گزینه را انتخاب کنید:"
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['hamsan_gozini']['main_keyboard'])
+
+    return HAMSAN_GOZINI_MENU
+
+
 async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await CheckSubs(update, context):
         return

@@ -93,6 +93,8 @@ conversations = {
         states={
             HAMSAN_GOZINI_MENU: [CallbackQueryHandler(pattern='^chat_requests_list$',
                                                       callback=HamsanGoziniChatRequestsListCallback)],
+            HAMSAN_GOZINI_CHAT_REQUESTS: [CallbackQueryHandler(pattern='^back$',
+                                                               callback=HamsanGoziniGoBackMenu)]
         },
         fallbacks=[commands['Main-Menu'],
                    commands['Start']],
