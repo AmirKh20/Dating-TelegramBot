@@ -38,6 +38,8 @@ CONSULTATION = 14
 SUPPORT = 17
 
 HAMSAN_GOZINI_CHAT_REQUESTS = 18
+HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN = 19
+HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE = 20
 
 END = ConversationHandler.END
 
@@ -330,6 +332,37 @@ async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: Co
     results = GetChatRequestsGottenList(update.effective_user.id)
 
     await query.answer(results=results)
+
+
+async def HamsanGoziniChatRequestsGivenProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
+
+    message_text = (
+        f"{other_user_id}\n"
+        "با این کاربر چیکار میخواهی کنی:"
+    )
+    await ReplyMessage(update,
+                       text=message_text,
+                       reply_keyboard_markup=inline_keyboards['user_profile']['chat_requests']['given_menu'][
+                           'main_menu'])
+
+    return HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN
+
+
+async def HamsanGoziniChatRequestsGivenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = query.message.text.split(maxsplit=1)[0]
+    message_text = (
+        f"{other_user_id}\n"
+        "پروفایل طرف شامل فیلد های فلان..."
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['user_profile']['chat_requests']['given_menu'][
+                                      'profile'])
+
+    return HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE
 
 
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

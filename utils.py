@@ -3,8 +3,7 @@ from os import getenv
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent, \
-    InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import ContextTypes
 
 load_dotenv()
@@ -15,6 +14,7 @@ FINANCIAL_CHARGE_URL = getenv('FINANCIAL_CHARGE_URL')
 QA_GROUP_ID = int(getenv('QA_GROUP_ID'))
 QA_CHANNEL = getenv('QA_CHANNEL')
 SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
+BOT_USERNAME = getenv('BOT_USERNAME')
 
 
 async def SendMessage(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, reply_markup=None) -> None:
@@ -87,24 +87,28 @@ def GetProvinceNamesInlineSequence():
 
 def GetChatRequestsGivenList(user_id):
     results = []
-    reply_markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
-        [InlineKeyboardButton('حذف از لیست و پس گرفتن درخواست', callback_data='delete_from_given_list')]
-    ])
+
+    message_text_content = (
+        "درخواست داده به:\n"
+        "/user_545132150"
+    )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='امیر',
                                             input_message_content=InputTextMessageContent(
-                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                                message_text=message_text_content
                                             ),
-                                            reply_markup=reply_markup
                                             )
                    )
+
+    message_text_content = (
+        "درخواست داده به:\n"
+        "/user_66541247"
+    )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='علی',
                                             input_message_content=InputTextMessageContent(
-                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                                message_text=message_text_content
                                             ),
-                                            reply_markup=reply_markup
                                             )
                    )
 
@@ -113,26 +117,34 @@ def GetChatRequestsGivenList(user_id):
 
 def GetChatRequestsGottenList(user_id):
     results = []
-    reply_markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+    # reply_markup = InlineKeyboardMarkup([
+    #     [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+    #
+    #     [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
+    #      InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
+    # ])
 
-        [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
-         InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
-    ])
+    message_text_content = (
+        "/user_545132150\n"
+        "پروفایل فرد شامل شهر و سن و عکس و ..."
+    )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='امیر',
                                             input_message_content=InputTextMessageContent(
-                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                                message_text=message_text_content
                                             ),
-                                            reply_markup=reply_markup
                                             )
                    )
+
+    message_text_content = (
+        "/user_66541247\n"
+        "پروفایل فرد شامل شهر و سن و عکس و ..."
+    )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='علی',
                                             input_message_content=InputTextMessageContent(
-                                                'پروفایل فرد شامل شهر و سن و عکس و ...'
+                                                message_text=message_text_content
                                             ),
-                                            reply_markup=reply_markup
                                             )
                    )
 

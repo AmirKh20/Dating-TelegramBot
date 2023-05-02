@@ -11,6 +11,7 @@ FINANCIAL_CHARGE_URL: the url for financial charge button
 QA_GROUP_ID: chat_id for the QA group.
 QA_CHANNEL: username of the channel which questions are posted.
 SUPPORT_GROUP_ID: chat_id for the support group.
+BOT_USERNAME: the bot username with @ before it: @botusername
 """
 
 import logging
@@ -28,7 +29,7 @@ LOG_FILENAME = getenv('LOG_FILENAME', 'bot.log')
 logging.basicConfig(
     filename=LOG_FILENAME,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.DEBUG
 )
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,8 @@ def main():
 
     application.add_handler(handlers.given_list_inline_query_handler)
     application.add_handler(handlers.gotten_list_inline_query_handler)
+
+    application.add_handler(handlers.conversations['Chat-Requests'])
 
     application.run_polling()
 

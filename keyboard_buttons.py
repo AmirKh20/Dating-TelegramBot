@@ -139,5 +139,30 @@ inline_keyboards = {
         'not_answered': InlineKeyboardMarkup([
             [InlineKeyboardButton('❌', callback_data='ticked_not_answered')]
         ])
+    },
+
+    'user_profile': {
+        'chat_requests': {
+            'given_menu': {
+                'main_menu': InlineKeyboardMarkup([
+                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+
+                    [InlineKeyboardButton('حذف از لیست و پس گرفتن درخواست', callback_data='delete_from_given_list')]
+                ]),
+
+                'profile': InlineKeyboardMarkup([
+                    [InlineKeyboardButton('لایک', callback_data='like_user'),
+                     InlineKeyboardButton('مسدود کردن', callback_data='block_user_from_user')],
+
+                    [InlineKeyboardButton('افزودن به مخاطبین', callback_data='add_to_contacts'),
+                     InlineKeyboardButton('گزارش کاربر', callback_data='report_user')],
+
+                    [InlineKeyboardButton('اعلان ها', callback_data='notifications'),
+                     InlineKeyboardButton('پیام دایرکت', callback_data='direct_message_request')],
+
+                    [InlineKeyboardButton('هدیه', callback_data='gift')]
+                ])
+            }
+        }
     }
 }

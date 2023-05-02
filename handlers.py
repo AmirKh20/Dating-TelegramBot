@@ -81,6 +81,14 @@ messages = {
         'Answer-Ticket': MessageHandler(filters.TEXT & filters.REPLY
                                         & ~filters.COMMAND & filters.Chat(chat_id=SUPPORT_GROUP_ID),
                                         SupportAnswerTicketCallback)
+    },
+
+    'User-Profile': {
+        'Chat-Requests': {
+            'Given': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست داده به:'),
+                                    callback=HamsanGoziniChatRequestsGivenProfileCallback),
+            # 'Gotten':
+        }
     }
 }
 
@@ -223,6 +231,24 @@ conversations = {
         },
         persistent=True,
         name='support_conversation'
+    ),
+
+    'Chat-Requests': ConversationHandler(
+        entry_points=[messages['User-Profile']['Chat-Requests']['Given']],
+        states={
+            HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN: [
+                CallbackQueryHandler(pattern='^show_user_profile$',
+                                     callback=HamsanGoziniChatRequestsGivenShowProfileCallback)
+            ],
+            HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE: [
+
+            ]
+        },
+        fallbacks=[messages['Main-Menu'],
+                   commands['Main-Menu'],
+                   messages['User-Profile']['Chat-Requests']['Given']],
+        persistent=True,
+        name='chat_requests_conversation'
     )
 }
 
