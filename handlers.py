@@ -3,7 +3,6 @@
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    filters,
     CallbackQueryHandler,
     InlineQueryHandler
 )
@@ -87,9 +86,13 @@ messages = {
         'Chat-Requests': {
             'Given': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست داده به:'),
                                     callback=HamsanGoziniChatRequestsGivenProfileCallback),
-            # 'Gotten':
+            'Gotten': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست گرفته از:'),
+                                     callback=HamsanGoziniChatRequestsGottenProfileCallback)
         }
-    }
+    },
+
+    'Chatting': MessageHandler(chatting_filter & filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
+                               callback=ChattingCallback)
 }
 
 # Conversation handlers that modify the workflow of the bot
@@ -234,7 +237,8 @@ conversations = {
     ),
 
     'Chat-Requests': ConversationHandler(
-        entry_points=[messages['User-Profile']['Chat-Requests']['Given']],
+        entry_points=[messages['User-Profile']['Chat-Requests']['Given'],
+                      messages['User-Profile']['Chat-Requests']['Gotten']],
         states={
             HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN: [
                 CallbackQueryHandler(pattern='^show_user_profile$',
@@ -242,11 +246,17 @@ conversations = {
             ],
             HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE: [
 
+            ],
+
+            HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN: [
+                CallbackQueryHandler(pattern='^accept_chat_request$',
+                                     callback=HamsanGoziniChatRequestsGottenAcceptRequestCallback)
             ]
         },
         fallbacks=[messages['Main-Menu'],
                    commands['Main-Menu'],
-                   messages['User-Profile']['Chat-Requests']['Given']],
+                   messages['User-Profile']['Chat-Requests']['Given'],
+                   messages['User-Profile']['Chat-Requests']['Gotten']],
         persistent=True,
         name='chat_requests_conversation'
     )

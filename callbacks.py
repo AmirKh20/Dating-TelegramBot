@@ -40,6 +40,7 @@ SUPPORT = 17
 HAMSAN_GOZINI_CHAT_REQUESTS = 18
 HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN = 19
 HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE = 20
+HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN = 21
 
 END = ConversationHandler.END
 
@@ -363,6 +364,77 @@ async def HamsanGoziniChatRequestsGivenShowProfileCallback(update: Update, conte
                                       'profile'])
 
     return HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE
+
+
+async def HamsanGoziniChatRequestsGottenProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
+
+    message_text = (
+        f"{other_user_id}\n"
+        "با این کاربر چیکار میخواهی کنی:"
+    )
+    await ReplyMessage(update,
+                       text=message_text,
+                       reply_keyboard_markup=inline_keyboards['user_profile']['chat_requests']['gotten_menu'][
+                           'main_menu'])
+
+    return HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN
+
+
+async def HamsanGoziniChatRequestsGottenAcceptRequestCallback(update: Update,
+                                                              context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = int(query.message.text.split(maxsplit=1)[0])
+    this_user_id = int(update.effective_user.id)
+
+    message_text_to_this_user = (
+        "درخواست "
+        f"{other_user_id} "
+        "پذیرفته شد!"
+    )
+    await query.edit_message_text(text=message_text_to_this_user)
+
+    start_chatting_message_to_this_user = (
+        "شروع به چت با "
+        f"{other_user_id} "
+        "کنید.\n"
+        "برای پایان و کنسل کردن چت "
+        "/end_chat "
+        "رو بفرست."
+    )
+    await SendMessage(update,
+                      context,
+                      text=start_chatting_message_to_this_user,
+                      reply_markup=button_keyboards['no_keyboard'])
+
+    start_chatting_message_to_other_user = (
+        "درخواست چت شما از طرف "
+        f"{this_user_id} "
+        "قبول شد!\n"
+        "شروع به چت کردن کن\n"
+        "برای پایان و کنسل کردن چت "
+        "/end_chat "
+        "رو بفرست."
+    )
+    await context.bot.send_message(chat_id=other_user_id,
+                                   text=start_chatting_message_to_other_user,
+                                   reply_markup=button_keyboards['no_keyboard'])
+
+    chatting_filter.add_chat_ids([other_user_id, this_user_id])
+
+    context.bot_data[other_user_id] = this_user_id
+    context.bot_data[this_user_id] = other_user_id
+
+    return END
+
+
+async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    other_user_id = context.bot_data[update.effective_user.id]
+
+    await context.bot.send_message(chat_id=other_user_id,
+                                   text=update.message.text)
 
 
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

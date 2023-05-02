@@ -38,6 +38,8 @@ def main():
     persistence = PicklePersistence(filepath='bot_persistence')
     application = ApplicationBuilder().token(BOT_TOKEN).persistence(persistence).build()
 
+    application.add_handler(handlers.messages['Chatting'])
+
     application.add_handler(handlers.conversations['Starting'])
     application.add_handler(handlers.commands['Help'])
     application.add_handler(handlers.messages['Main-Menu'])

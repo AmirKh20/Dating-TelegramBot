@@ -162,6 +162,15 @@ inline_keyboards = {
 
                     [InlineKeyboardButton('هدیه', callback_data='gift')]
                 ])
+            },
+
+            'gotten_menu': {
+                'main_menu': InlineKeyboardMarkup([
+                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+
+                    [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
+                     InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
+                ])
             }
         }
     }

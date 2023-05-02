@@ -3,8 +3,16 @@ from os import getenv
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
-from telegram.ext import ContextTypes
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
+from telegram.ext import (
+    ContextTypes,
+    filters
+)
 
 load_dotenv()
 CHANNEL_USERNAME = getenv('CHANNEL_USERNAME')
@@ -15,6 +23,8 @@ QA_GROUP_ID = int(getenv('QA_GROUP_ID'))
 QA_CHANNEL = getenv('QA_CHANNEL')
 SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
 BOT_USERNAME = getenv('BOT_USERNAME')
+
+chatting_filter = filters.Chat()
 
 
 async def SendMessage(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, reply_markup=None) -> None:
@@ -117,16 +127,10 @@ def GetChatRequestsGivenList(user_id):
 
 def GetChatRequestsGottenList(user_id):
     results = []
-    # reply_markup = InlineKeyboardMarkup([
-    #     [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
-    #
-    #     [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
-    #      InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
-    # ])
 
     message_text_content = (
-        "/user_545132150\n"
-        "پروفایل فرد شامل شهر و سن و عکس و ..."
+        "درخواست گرفته از:\n"
+        "/user_545132150"
     )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='امیر',
@@ -137,8 +141,8 @@ def GetChatRequestsGottenList(user_id):
                    )
 
     message_text_content = (
-        "/user_66541247\n"
-        "پروفایل فرد شامل شهر و سن و عکس و ..."
+        "درخواست گرفته از:\n"
+        "/user_66541247"
     )
     results.append(InlineQueryResultArticle(id=uuid4().hex,
                                             title='علی',
