@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/bin/env python
 
 """
 The Environment variables that need to be set in .env file:
@@ -36,9 +36,14 @@ logger = logging.getLogger(__name__)
 
 def main():
     persistence = PicklePersistence(filepath='bot_persistence')
-    application = ApplicationBuilder().token(BOT_TOKEN).persistence(persistence).build()
+    application = ApplicationBuilder() \
+        .token(BOT_TOKEN) \
+        .persistence(persistence) \
+        .read_timeout(20.0) \
+        .write_timeout(20.0) \
+        .build()
 
-    application.add_handler(handlers.messages['Chatting'])
+    application.add_handler(handlers.conversations['Chatting'])
 
     application.add_handler(handlers.conversations['Starting'])
     application.add_handler(handlers.commands['Help'])
@@ -54,7 +59,10 @@ def main():
     application.add_handler(handlers.given_list_inline_query_handler)
     application.add_handler(handlers.gotten_list_inline_query_handler)
 
-    application.add_handler(handlers.conversations['Chat-Requests'])
+    application.add_handlers([handlers.conversations['Chat-Requests']['Given'],
+                              handlers.conversations['Chat-Requests']['Gotten']])
+
+    application.add_error_handler(handlers.ErrorHandler)
 
     application.run_polling()
 

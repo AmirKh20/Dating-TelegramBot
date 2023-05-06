@@ -27,16 +27,24 @@ BOT_USERNAME = getenv('BOT_USERNAME')
 chatting_filter = filters.Chat()
 
 
-async def SendMessage(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, reply_markup=None) -> None:
+async def SendMessage(update: Update,
+                      context: ContextTypes.DEFAULT_TYPE,
+                      text: str,
+                      reply_markup=None,
+                      **kwargs) -> None:
     """
     This function sends a message in the current chat with the given text.
     """
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text=text,
-                                   reply_markup=reply_markup)
+                                   reply_markup=reply_markup,
+                                   **kwargs)
 
 
-async def ReplyMessage(update: Update, text: str, reply_keyboard_markup=None) -> None:
+async def ReplyMessage(update: Update,
+                       text: str,
+                       reply_keyboard_markup=None,
+                       **kwargs) -> None:
     """
     This function replies to the last message the user sent with the given text
     It also replies the text with the given keyboard buttons if it was specified.
@@ -44,7 +52,8 @@ async def ReplyMessage(update: Update, text: str, reply_keyboard_markup=None) ->
     """
     await update.message.reply_text(text=text,
                                     reply_to_message_id=update.message.message_id,
-                                    reply_markup=reply_keyboard_markup)
+                                    reply_markup=reply_keyboard_markup,
+                                    **kwargs)
 
 
 async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
@@ -98,29 +107,31 @@ def GetProvinceNamesInlineSequence():
 def GetChatRequestsGivenList(user_id):
     results = []
 
-    message_text_content = (
-        "درخواست داده به:\n"
-        "/user_545132150"
-    )
-    results.append(InlineQueryResultArticle(id=uuid4().hex,
-                                            title='امیر',
-                                            input_message_content=InputTextMessageContent(
-                                                message_text=message_text_content
-                                            ),
-                                            )
-                   )
+    if user_id == 66541247:
+        message_text_content = (
+            "درخواست داده به:\n"
+            "/user_545132150"
+        )
+        results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                                title='امیر',
+                                                input_message_content=InputTextMessageContent(
+                                                    message_text=message_text_content
+                                                ),
+                                                )
+                       )
 
-    message_text_content = (
-        "درخواست داده به:\n"
-        "/user_66541247"
-    )
-    results.append(InlineQueryResultArticle(id=uuid4().hex,
-                                            title='علی',
-                                            input_message_content=InputTextMessageContent(
-                                                message_text=message_text_content
-                                            ),
-                                            )
-                   )
+    elif user_id == 545132150:
+        message_text_content = (
+            "درخواست داده به:\n"
+            "/user_66541247"
+        )
+        results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                                title='علی',
+                                                input_message_content=InputTextMessageContent(
+                                                    message_text=message_text_content
+                                                ),
+                                                )
+                       )
 
     return results
 
@@ -128,28 +139,30 @@ def GetChatRequestsGivenList(user_id):
 def GetChatRequestsGottenList(user_id):
     results = []
 
-    message_text_content = (
-        "درخواست گرفته از:\n"
-        "/user_545132150"
-    )
-    results.append(InlineQueryResultArticle(id=uuid4().hex,
-                                            title='امیر',
-                                            input_message_content=InputTextMessageContent(
-                                                message_text=message_text_content
-                                            ),
-                                            )
-                   )
+    if user_id == 66541247:
+        message_text_content = (
+            "درخواست گرفته از:\n"
+            "/user_545132150"
+        )
+        results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                                title='امیر',
+                                                input_message_content=InputTextMessageContent(
+                                                    message_text=message_text_content
+                                                ),
+                                                )
+                       )
 
-    message_text_content = (
-        "درخواست گرفته از:\n"
-        "/user_66541247"
-    )
-    results.append(InlineQueryResultArticle(id=uuid4().hex,
-                                            title='علی',
-                                            input_message_content=InputTextMessageContent(
-                                                message_text=message_text_content
-                                            ),
-                                            )
-                   )
+    elif user_id == 545132150:
+        message_text_content = (
+            "درخواست گرفته از:\n"
+            "/user_66541247"
+        )
+        results.append(InlineQueryResultArticle(id=uuid4().hex,
+                                                title='علی',
+                                                input_message_content=InputTextMessageContent(
+                                                    message_text=message_text_content
+                                                ),
+                                                )
+                       )
 
     return results

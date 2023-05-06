@@ -145,7 +145,7 @@ inline_keyboards = {
         'chat_requests': {
             'given_menu': {
                 'main_menu': InlineKeyboardMarkup([
-                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_given_user_profile')],
 
                     [InlineKeyboardButton('حذف از لیست و پس گرفتن درخواست', callback_data='delete_from_given_list')]
                 ]),
@@ -160,16 +160,31 @@ inline_keyboards = {
                     [InlineKeyboardButton('اعلان ها', callback_data='notifications'),
                      InlineKeyboardButton('پیام دایرکت', callback_data='direct_message_request')],
 
-                    [InlineKeyboardButton('هدیه', callback_data='gift')]
+                    [InlineKeyboardButton('هدیه', callback_data='gift')],
+
+                    [InlineKeyboardButton('بازگشت', callback_data='back_to_given_menu')]
                 ])
             },
 
             'gotten_menu': {
                 'main_menu': InlineKeyboardMarkup([
-                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_user_profile')],
+                    [InlineKeyboardButton('مشاهده پروفایل', callback_data='show_gotten_user_profile')],
 
                     [InlineKeyboardButton('قبول ✅', callback_data='accept_chat_request'),
                      InlineKeyboardButton('رد ❌', callback_data='reject_chat_request')]
+                ]),
+
+                'profile': InlineKeyboardMarkup([
+                    [InlineKeyboardButton('لایک', callback_data='like_user'),
+                     InlineKeyboardButton('مسدود کردن', callback_data='block_user_from_user')],
+
+                    [InlineKeyboardButton('افزودن به مخاطبین', callback_data='add_to_contacts'),
+                     InlineKeyboardButton('گزارش کاربر', callback_data='report_user')],
+
+                    [InlineKeyboardButton('اعلان ها', callback_data='notifications'),
+                     InlineKeyboardButton('هدیه', callback_data='gift')],
+
+                    [InlineKeyboardButton('بازگشت', callback_data='back_to_gotten_menu')]
                 ])
             }
         }

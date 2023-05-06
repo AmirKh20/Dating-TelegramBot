@@ -1,8 +1,12 @@
-from telegram import ForceReply
+import logging
+
+from telegram import ForceReply, error
 from telegram.ext import ConversationHandler
 
 from keyboard_buttons import button_keyboards, inline_keyboards
 from utils import *
+
+logger = logging.getLogger('__main__')
 
 # States in the conversation handlers
 
@@ -38,9 +42,13 @@ CONSULTATION = 14
 SUPPORT = 17
 
 HAMSAN_GOZINI_CHAT_REQUESTS = 18
-HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN = 19
-HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE = 20
-HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN = 21
+
+CHAT_REQUESTS_GIVEN = 19
+CHAT_REQUESTS_GIVEN_PROFILE = 20
+CHAT_REQUESTS_GOTTEN = 21
+CHAT_REQUESTS_GOTTEN_PROFILE = 22
+
+CHATTING = 23
 
 END = ConversationHandler.END
 
@@ -321,7 +329,7 @@ async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: Con
 
     results = GetChatRequestsGivenList(update.effective_user.id)
 
-    await query.answer(results=results)
+    await query.answer(results=results, is_personal=True, cache_time=60)
 
 
 async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -332,10 +340,10 @@ async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: Co
 
     results = GetChatRequestsGottenList(update.effective_user.id)
 
-    await query.answer(results=results)
+    await query.answer(results=results, is_personal=True, cache_time=60)
 
 
-async def HamsanGoziniChatRequestsGivenProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ChatRequestsGivenMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
 
     message_text = (
@@ -347,10 +355,10 @@ async def HamsanGoziniChatRequestsGivenProfileCallback(update: Update, context: 
                        reply_keyboard_markup=inline_keyboards['user_profile']['chat_requests']['given_menu'][
                            'main_menu'])
 
-    return HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN
+    return CHAT_REQUESTS_GIVEN
 
 
-async def HamsanGoziniChatRequestsGivenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ChatRequestsGivenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
 
@@ -363,10 +371,26 @@ async def HamsanGoziniChatRequestsGivenShowProfileCallback(update: Update, conte
                                   reply_markup=inline_keyboards['user_profile']['chat_requests']['given_menu'][
                                       'profile'])
 
-    return HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE
+    return CHAT_REQUESTS_GIVEN_PROFILE
 
 
-async def HamsanGoziniChatRequestsGottenProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ChatRequestsGivenProfileGoBackCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = query.message.text.split(maxsplit=1)[0]
+    message_text = (
+        f"{other_user_id}\n"
+        "با این کاربر چیکار میخواهی کنی:"
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['user_profile']['chat_requests']['given_menu'][
+                                      'main_menu'])
+
+    return CHAT_REQUESTS_GIVEN
+
+
+async def ChatRequestsGottenMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
 
     message_text = (
@@ -378,11 +402,10 @@ async def HamsanGoziniChatRequestsGottenProfileCallback(update: Update, context:
                        reply_keyboard_markup=inline_keyboards['user_profile']['chat_requests']['gotten_menu'][
                            'main_menu'])
 
-    return HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN
+    return CHAT_REQUESTS_GOTTEN
 
 
-async def HamsanGoziniChatRequestsGottenAcceptRequestCallback(update: Update,
-                                                              context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
 
@@ -430,11 +453,142 @@ async def HamsanGoziniChatRequestsGottenAcceptRequestCallback(update: Update,
     return END
 
 
-async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    other_user_id = context.bot_data[update.effective_user.id]
+async def ChatRequestsGottenRejectRequestCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = int(query.message.text.split(maxsplit=1)[0])
+    this_user_id = int(update.effective_user.id)
+
+    message_text_to_this_user = (
+        "درخواست "
+        f"{other_user_id} "
+        "رد شد!"
+    )
+    await query.edit_message_text(text=message_text_to_this_user)
+
+    rejecting_message_to_other_user = (
+        "درخواست چت شما از طرف "
+        f"{this_user_id} "
+        "رد شد!\n"
+    )
+    await context.bot.send_message(chat_id=other_user_id,
+                                   text=rejecting_message_to_other_user)
+
+    # TODO: Deleting from both lists the ids of the users
+
+    return END
+
+
+async def ChatRequestsGottenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = query.message.text.split(maxsplit=1)[0]
+    message_text = (
+        f"{other_user_id}\n"
+        "پروفایل طرف شامل فیلد های فلان..."
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['user_profile']['chat_requests']['gotten_menu'][
+                                      'profile'])
+
+    return CHAT_REQUESTS_GOTTEN_PROFILE
+
+
+async def ChatRequestsGottenProfileGoBackCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+
+    other_user_id = query.message.text.split(maxsplit=1)[0]
+    message_text = (
+        f"{other_user_id}\n"
+        "با این کاربر چیکار میخواهی کنی:"
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['user_profile']['chat_requests']['gotten_menu'][
+                                      'main_menu'])
+
+    return CHAT_REQUESTS_GOTTEN
+
+
+async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    this_user_id = update.effective_user.id
+
+    if this_user_id not in context.bot_data:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = context.bot_data[this_user_id]
 
     await context.bot.send_message(chat_id=other_user_id,
-                                   text=update.message.text)
+                                   text=update.message.text,
+                                   write_timeout=30,
+                                   connect_timeout=60)
+
+    return CHATTING
+
+
+async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not isinstance(update, Update):
+        return
+
+    logger.exception(f"Exception in error handler for user {update.effective_user.id}:", exc_info=context.error)
+
+    if isinstance(context.error, error.TimedOut):
+        await ReplyMessage(update,
+                           text='مشکلی پیش آمد. لطفا دوباره پیام خود را بفرستید',
+                           **{"write_timeout": 30, "connect_timeout": 60})
+
+
+async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
+    this_user_id = update.effective_user.id
+
+    if this_user_id not in bot_data:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = context.bot_data[this_user_id]
+
+    chatting_filter.remove_chat_ids([this_user_id, other_user_id])
+    del bot_data[this_user_id]
+    del bot_data[other_user_id]
+
+    message_text_to_other_user = (
+        "چت با "
+        f"/user_{this_user_id} "
+        "توسط ایشان پایان یافت!"
+    )
+    await context.bot.send_message(chat_id=other_user_id,
+                                   text=message_text_to_other_user,
+                                   connect_timeout=60)
+    canceling_message_text = (
+        "برای بازگشت به منوی اصلی روی "
+        "/main_menu "
+        "کلیک کنید"
+    )
+    await context.bot.send_message(chat_id=other_user_id,
+                                   text=canceling_message_text,
+                                   connect_timeout=60)
+
+    message_text_to_this_user = (
+        "چت با "
+        f"/user_{other_user_id} "
+        "پایان یافت!"
+    )
+    await ReplyMessage(update,
+                       text=message_text_to_this_user,
+                       **{"connect_timeout": 60})
+
+    canceling_message_text = (
+        "بازگشت به منوی اصلی"
+    )
+    await SendMessage(update, context,
+                      text=canceling_message_text,
+                      reply_markup=button_keyboards['default_keyboard'],
+                      **{"connect_timeout": 60})
+    return END
 
 
 async def ProfileEntryCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

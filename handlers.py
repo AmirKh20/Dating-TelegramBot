@@ -13,11 +13,13 @@ not_edited_messages_filter = ~filters.UpdateType.EDITED_MESSAGE
 
 # Command Handlers that runs the callback function when ever /command is sent
 commands = {
-    'Main-Menu': CommandHandler('main_menu', MainMenuCallback, filters=not_edited_messages_filter),
+    'Main-Menu': CommandHandler('main_menu', MainMenuCallback, filters=not_edited_messages_filter & ~chatting_filter),
 
     'Help': CommandHandler('help', HelpCallback, filters=not_edited_messages_filter),
 
     'Start': CommandHandler('start', StartCallback, filters=not_edited_messages_filter),
+
+    'End-Chat': CommandHandler('end_chat', ChattingEndChatCallback, filters=chatting_filter)
 }
 
 # Message handlers that run the callback function when ever the message contains the filters
@@ -85,14 +87,19 @@ messages = {
     'User-Profile': {
         'Chat-Requests': {
             'Given': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست داده به:'),
-                                    callback=HamsanGoziniChatRequestsGivenProfileCallback),
+                                    callback=ChatRequestsGivenMenuCallback),
             'Gotten': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست گرفته از:'),
-                                     callback=HamsanGoziniChatRequestsGottenProfileCallback)
+                                     callback=ChatRequestsGottenMenuCallback)
         }
     },
 
-    'Chatting': MessageHandler(chatting_filter & filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
-                               callback=ChattingCallback)
+    'Chatting': {
+        'Entry': MessageHandler(filters.TEXT & chatting_filter &
+                                filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
+                                callback=ChattingCallback),
+        'Text-No-Reply': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                        callback=ChattingCallback)
+    }
 }
 
 # Conversation handlers that modify the workflow of the bot
@@ -236,29 +243,58 @@ conversations = {
         name='support_conversation'
     ),
 
-    'Chat-Requests': ConversationHandler(
-        entry_points=[messages['User-Profile']['Chat-Requests']['Given'],
-                      messages['User-Profile']['Chat-Requests']['Gotten']],
+    'Chat-Requests': {
+        'Given': ConversationHandler(
+            entry_points=[messages['User-Profile']['Chat-Requests']['Given']],
+            states={
+                CHAT_REQUESTS_GIVEN: [
+                    CallbackQueryHandler(pattern='^show_given_user_profile$',
+                                         callback=ChatRequestsGivenShowProfileCallback)
+                ],
+
+                CHAT_REQUESTS_GIVEN_PROFILE: [
+                    CallbackQueryHandler(pattern='^back_to_given_menu$',
+                                         callback=ChatRequestsGivenProfileGoBackCallback)
+                ],
+            },
+            fallbacks=[commands['Main-Menu'],
+                       messages['User-Profile']['Chat-Requests']['Given']],
+            persistent=True,
+            name='chat_requests_given_conversation'
+        ),
+
+        'Gotten': ConversationHandler(
+            entry_points=[messages['User-Profile']['Chat-Requests']['Gotten']],
+            states={
+                CHAT_REQUESTS_GOTTEN: [
+                    CallbackQueryHandler(pattern='^accept_chat_request$',
+                                         callback=ChatRequestsGottenAcceptRequestCallback),
+                    CallbackQueryHandler(pattern='^reject_chat_request$',
+                                         callback=ChatRequestsGottenRejectRequestCallback),
+                    CallbackQueryHandler(pattern='^show_gotten_user_profile$',
+                                         callback=ChatRequestsGottenShowProfileCallback)
+                ],
+
+                CHAT_REQUESTS_GOTTEN_PROFILE: [
+                    CallbackQueryHandler(pattern='^back_to_gotten_menu$',
+                                         callback=ChatRequestsGottenProfileGoBackCallback)
+                ]
+            },
+            fallbacks=[commands['Main-Menu'],
+                       messages['User-Profile']['Chat-Requests']['Gotten']],
+            persistent=True,
+            name='chat_requests_gotten_conversation'
+        ),
+    },
+
+    'Chatting': ConversationHandler(
+        entry_points=[messages['Chatting']['Entry'],
+                      commands['End-Chat']],
         states={
-            HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN: [
-                CallbackQueryHandler(pattern='^show_user_profile$',
-                                     callback=HamsanGoziniChatRequestsGivenShowProfileCallback)
-            ],
-            HAMSAN_GOZINI_CHAT_REQUESTS_GIVEN_PROFILE: [
-
-            ],
-
-            HAMSAN_GOZINI_CHAT_REQUESTS_GOTTEN: [
-                CallbackQueryHandler(pattern='^accept_chat_request$',
-                                     callback=HamsanGoziniChatRequestsGottenAcceptRequestCallback)
-            ]
+            CHATTING: [messages['Chatting']['Text-No-Reply']]
         },
-        fallbacks=[messages['Main-Menu'],
-                   commands['Main-Menu'],
-                   messages['User-Profile']['Chat-Requests']['Given'],
-                   messages['User-Profile']['Chat-Requests']['Gotten']],
-        persistent=True,
-        name='chat_requests_conversation'
+        fallbacks=[commands['End-Chat'],
+                   commands['Main-Menu']],
     )
 }
 
