@@ -1,3 +1,4 @@
+import pickle
 from os import getenv
 from uuid import uuid4
 
@@ -21,7 +22,11 @@ QA_CHANNEL = getenv('QA_CHANNEL')
 SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
 BOT_USERNAME = getenv('BOT_USERNAME')
 
-chatting_filter = filters.Chat()
+try:
+    with open('chatting_filter.pkl', 'rb') as pkl_file:
+        chatting_filter = pickle.load(pkl_file)
+except FileNotFoundError:
+    chatting_filter = filters.Chat()
 
 
 async def SendMessage(update: Update,

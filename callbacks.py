@@ -447,6 +447,8 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
                                    reply_markup=button_keyboards['no_keyboard'])
 
     chatting_filter.add_chat_ids([other_user_id, this_user_id])
+    with open('chatting_filter.pkl', 'wb') as file:
+        pickle.dump(chatting_filter, file)
 
     context.bot_data[other_user_id] = this_user_id
     context.bot_data[this_user_id] = other_user_id
@@ -553,6 +555,9 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     other_user_id = context.bot_data[this_user_id]
 
     chatting_filter.remove_chat_ids([this_user_id, other_user_id])
+    with open('chatting_filter.pkl', 'wb') as file:
+        pickle.dump(chatting_filter, file)
+
     del bot_data[this_user_id]
     del bot_data[other_user_id]
 
