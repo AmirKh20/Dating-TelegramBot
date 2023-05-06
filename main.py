@@ -5,7 +5,6 @@ The Environment variables that need to be set in .env file:
 BOT_TOKEN: The bot token
 CHANNEL_USERNAME: username of the channel which users should be subscribed into in the format of '@username'
 LOG_FILENAME: DEFAULT: bot.log. The filename of the log file which the logs are written into
-PROVINCES_FILE: DEFAULT: provinces_cities.json. Json file containing provinces
 WEBSITE_URL: the url of the website when clicking on profile edit
 FINANCIAL_CHARGE_URL: the url for financial charge button
 QA_GROUP_ID: chat_id for the QA group.

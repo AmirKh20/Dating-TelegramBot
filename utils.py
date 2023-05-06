@@ -1,11 +1,9 @@
-import json
 from os import getenv
 from uuid import uuid4
 
 from dotenv import load_dotenv
 from telegram import (
     Update,
-    InlineKeyboardButton,
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
@@ -16,7 +14,6 @@ from telegram.ext import (
 
 load_dotenv()
 CHANNEL_USERNAME = getenv('CHANNEL_USERNAME')
-PROVINCES_FILE = getenv('PROVINCES_FILE', 'provinces_cities.json')
 WEBSITE_URL = getenv('WEBSITE_URL')
 FINANCIAL_CHARGE_URL = getenv('FINANCIAL_CHARGE_URL')
 QA_GROUP_ID = int(getenv('QA_GROUP_ID'))
@@ -68,40 +65,6 @@ async def CheckSubs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
         await ReplyMessage(update, f'لطفا در کانال {CHANNEL_USERNAME} عضو شوید!')
         return False
     return True
-
-
-def GetProvinceNames() -> list[str]:
-    """
-    Utility to get the provinces' names from a json file
-    :return: list of strings containing the names of the provinces.
-    """
-    with open(PROVINCES_FILE, 'r') as json_file:
-        data = json.load(json_file)
-    names = [province['name'] for province in data]
-    return names
-
-
-def GetProvinceNamesInlineSequence():
-    """
-    Utility to get provinces' names in a 2D list of InlineKeyboardButton with 3 columns.
-    :return: 2D list of InlineKeyboardButton.
-    """
-    names = GetProvinceNames()
-    number_of_provinces = len(names)
-    number_of_3_rows_elements = number_of_provinces - number_of_provinces % 3  # for 31 provinces, this is equal to 30
-
-    buttons = []
-    for i in range(0, number_of_3_rows_elements, 3):
-        buttons.append([
-            InlineKeyboardButton(names[i], callback_data=names[i]),
-            InlineKeyboardButton(names[i + 1], callback_data=names[i + 1]),
-            InlineKeyboardButton(names[i + 2], callback_data=names[i + 2])
-        ])
-    # The rest of the provinces:
-    for i in range(number_of_3_rows_elements, number_of_provinces):
-        buttons.append([InlineKeyboardButton(names[i], callback_data=names[i])])
-
-    return buttons
 
 
 def GetChatRequestsGivenList(user_id):
