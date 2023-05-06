@@ -115,7 +115,8 @@ conversations = {
                                                                callback=HamsanGoziniGoBackMenu)]
         },
         fallbacks=[commands['Main-Menu'],
-                   commands['Start']],
+                   commands['Start'],
+                   messages['Hamsan-Gozini']],
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,
             END: END,
@@ -188,6 +189,7 @@ conversations = {
         fallbacks=[commands['Main-Menu'],
                    commands['Start'],
                    messages['Main-Menu'],
+                   messages['Financial']['Menu'],
                    messages['Financial']['Buy-Plan'],
                    messages['Financial']['Balance'],
                    messages['Financial']['Changes']['Menu'],
