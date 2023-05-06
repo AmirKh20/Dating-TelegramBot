@@ -524,7 +524,7 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await context.bot.send_message(chat_id=other_user_id,
                                    text=update.message.text,
                                    write_timeout=30,
-                                   connect_timeout=60)
+                                   connect_timeout=30)
 
     return CHATTING
 
@@ -538,7 +538,7 @@ async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> No
     if isinstance(context.error, error.TimedOut):
         await ReplyMessage(update,
                            text='مشکلی پیش آمد. لطفا دوباره پیام خود را بفرستید',
-                           **{"write_timeout": 30, "connect_timeout": 60})
+                           **{"write_timeout": 30, "connect_timeout": 30})
 
 
 async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -562,7 +562,7 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     )
     await context.bot.send_message(chat_id=other_user_id,
                                    text=message_text_to_other_user,
-                                   connect_timeout=60)
+                                   connect_timeout=30)
     canceling_message_text = (
         "برای بازگشت به منوی اصلی روی "
         "/main_menu "
@@ -570,7 +570,7 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     )
     await context.bot.send_message(chat_id=other_user_id,
                                    text=canceling_message_text,
-                                   connect_timeout=60)
+                                   connect_timeout=30)
 
     message_text_to_this_user = (
         "چت با "
@@ -579,7 +579,7 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     )
     await ReplyMessage(update,
                        text=message_text_to_this_user,
-                       **{"connect_timeout": 60})
+                       **{"connect_timeout": 30})
 
     canceling_message_text = (
         "بازگشت به منوی اصلی"
@@ -587,7 +587,7 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     await SendMessage(update, context,
                       text=canceling_message_text,
                       reply_markup=button_keyboards['default_keyboard'],
-                      **{"connect_timeout": 60})
+                      **{"connect_timeout": 30})
     return END
 
 
