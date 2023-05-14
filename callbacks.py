@@ -450,8 +450,12 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
     with open('chatting_filter.pkl', 'wb') as file:
         pickle.dump(chatting_filter, file)
 
-    context.bot_data[other_user_id] = this_user_id
-    context.bot_data[this_user_id] = other_user_id
+    bot_data = context.bot_data
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    bot_data['chatting_with'][other_user_id] = this_user_id
+    bot_data['chatting_with'][this_user_id] = other_user_id
 
     return END
 
@@ -519,18 +523,30 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     bot_data = context.bot_data
     this_user_id = update.effective_user.id
 
-    if this_user_id not in bot_data:
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    if this_user_id not in bot_data['chatting_with']:
         await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
         return END
 
-    other_user_id = bot_data[this_user_id]
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    if 'message_ids' not in bot_data:
+        bot_data['message_ids'] = {}
+
+    if this_user_id not in bot_data['message_ids']:
+        bot_data['message_ids'][this_user_id] = {}
+
+    if other_user_id not in bot_data['message_ids']:
+        bot_data['message_ids'][other_user_id] = {}
 
     message = update.message
     reply_message = message.reply_to_message
     reply_to_message_id = None
 
-    if reply_message and reply_message.message_id in bot_data:
-        reply_to_message_id = bot_data[reply_message.message_id]
+    if reply_message and reply_message.message_id in bot_data['message_ids'][this_user_id]:
+        reply_to_message_id = bot_data['message_ids'][this_user_id][reply_message.message_id]
 
     message_bot_sent = await context.bot.send_message(chat_id=other_user_id,
                                                       text=message.text,
@@ -538,8 +554,8 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                                                       connect_timeout=30,
                                                       reply_to_message_id=reply_to_message_id)
 
-    bot_data[message_bot_sent.message_id] = message.message_id
-    bot_data[message.message_id] = message_bot_sent.message_id
+    bot_data['message_ids'][other_user_id][message_bot_sent.message_id] = message.message_id
+    bot_data['message_ids'][this_user_id][message.message_id] = message_bot_sent.message_id
 
     return CHATTING
 
@@ -560,18 +576,24 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
     bot_data = context.bot_data
     this_user_id = update.effective_user.id
 
-    if this_user_id not in bot_data:
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    if this_user_id not in bot_data['chatting_with']:
         await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
         return END
 
-    other_user_id = context.bot_data[this_user_id]
+    other_user_id = bot_data['chatting_with'][this_user_id]
 
     chatting_filter.remove_chat_ids([this_user_id, other_user_id])
     with open('chatting_filter.pkl', 'wb') as file:
         pickle.dump(chatting_filter, file)
 
-    del bot_data[this_user_id]
-    del bot_data[other_user_id]
+    del bot_data['chatting_with'][this_user_id]
+    del bot_data['chatting_with'][other_user_id]
+
+    del bot_data['message_ids'][this_user_id]
+    del bot_data['message_ids'][other_user_id]
 
     message_text_to_other_user = (
         "چت با "
