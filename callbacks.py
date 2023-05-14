@@ -516,18 +516,30 @@ async def ChatRequestsGottenProfileGoBackCallback(update: Update, context: Conte
 
 
 async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
     this_user_id = update.effective_user.id
 
-    if this_user_id not in context.bot_data:
+    if this_user_id not in bot_data:
         await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
         return END
 
-    other_user_id = context.bot_data[this_user_id]
+    other_user_id = bot_data[this_user_id]
 
-    await context.bot.send_message(chat_id=other_user_id,
-                                   text=update.message.text,
-                                   write_timeout=30,
-                                   connect_timeout=30)
+    message = update.message
+    reply_message = message.reply_to_message
+    reply_to_message_id = None
+
+    if reply_message and reply_message.message_id in bot_data:
+        reply_to_message_id = bot_data[reply_message.message_id]
+
+    message_bot_sent = await context.bot.send_message(chat_id=other_user_id,
+                                                      text=message.text,
+                                                      write_timeout=30,
+                                                      connect_timeout=30,
+                                                      reply_to_message_id=reply_to_message_id)
+
+    bot_data[message_bot_sent.message_id] = message.message_id
+    bot_data[message.message_id] = message_bot_sent.message_id
 
     return CHATTING
 

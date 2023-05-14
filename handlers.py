@@ -94,11 +94,11 @@ messages = {
     },
 
     'Chatting': {
-        'Entry': MessageHandler(filters.TEXT & chatting_filter &
-                                filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
-                                callback=ChattingCallback),
-        'Text-No-Reply': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
-                                        callback=ChattingCallback)
+        'Entry-Text': MessageHandler(filters.TEXT & chatting_filter &
+                                     filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
+                                     callback=ChattingCallback),
+        'Text': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
+                               callback=ChattingCallback)
     }
 }
 
@@ -290,10 +290,10 @@ conversations = {
     },
 
     'Chatting': ConversationHandler(
-        entry_points=[messages['Chatting']['Entry'],
+        entry_points=[messages['Chatting']['Entry-Text'],
                       commands['End-Chat']],
         states={
-            CHATTING: [messages['Chatting']['Text-No-Reply']]
+            CHATTING: [messages['Chatting']['Text']]
         },
         fallbacks=[commands['End-Chat'],
                    commands['Main-Menu']],
