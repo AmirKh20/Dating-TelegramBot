@@ -413,6 +413,17 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
     other_user_id = int(query.message.text.split(maxsplit=1)[0])
     this_user_id = int(update.effective_user.id)
 
+    chatting_filter.add_chat_ids([other_user_id, this_user_id])
+    with open('chatting_filter.pkl', 'wb') as file:
+        pickle.dump(chatting_filter, file)
+
+    bot_data = context.bot_data
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    bot_data['chatting_with'][other_user_id] = this_user_id
+    bot_data['chatting_with'][this_user_id] = other_user_id
+
     message_text_to_this_user = (
         "درخواست "
         f"{other_user_id} "
@@ -445,17 +456,6 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
     await context.bot.send_message(chat_id=other_user_id,
                                    text=start_chatting_message_to_other_user,
                                    reply_markup=button_keyboards['no_keyboard'])
-
-    chatting_filter.add_chat_ids([other_user_id, this_user_id])
-    with open('chatting_filter.pkl', 'wb') as file:
-        pickle.dump(chatting_filter, file)
-
-    bot_data = context.bot_data
-    if 'chatting_with' not in bot_data:
-        bot_data['chatting_with'] = {}
-
-    bot_data['chatting_with'][other_user_id] = this_user_id
-    bot_data['chatting_with'][this_user_id] = other_user_id
 
     return END
 
@@ -521,11 +521,10 @@ async def ChatRequestsGottenProfileGoBackCallback(update: Update, context: Conte
 
 async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     bot_data = context.bot_data
-    this_user_id = update.effective_user.id
-
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
 
+    this_user_id = update.effective_user.id
     if this_user_id not in bot_data['chatting_with']:
         await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
         return END
@@ -619,11 +618,10 @@ async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     bot_data = context.bot_data
-    this_user_id = update.effective_user.id
-
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
 
+    this_user_id = update.effective_user.id
     if this_user_id not in bot_data['chatting_with']:
         await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
         return END
