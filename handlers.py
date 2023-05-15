@@ -97,13 +97,23 @@ messages = {
         'Entry-Text': MessageHandler(filters.TEXT & chatting_filter &
                                      filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
                                      callback=ChattingCallback),
+
         'Entry-Document': MessageHandler(filters.Document.ALL & chatting_filter &
                                          filters.ChatType.PRIVATE,
                                          callback=ChattingDocumentCallback),
+
+        'Entry-Audio': MessageHandler(filters.AUDIO & chatting_filter &
+                                      filters.ChatType.PRIVATE,
+                                      callback=ChattingAudioCallback),
+
         'Text': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
                                callback=ChattingCallback),
+
         'Document': MessageHandler(filters.Document.ALL,
-                                   callback=ChattingDocumentCallback)
+                                   callback=ChattingDocumentCallback),
+
+        'Audio': MessageHandler(filters.AUDIO,
+                                callback=ChattingAudioCallback)
     }
 }
 
@@ -297,10 +307,12 @@ conversations = {
     'Chatting': ConversationHandler(
         entry_points=[messages['Chatting']['Entry-Text'],
                       messages['Chatting']['Entry-Document'],
+                      messages['Chatting']['Entry-Audio'],
                       commands['End-Chat']],
         states={
             CHATTING: [messages['Chatting']['Text'],
-                       messages['Chatting']['Document']]
+                       messages['Chatting']['Document'],
+                       messages['Chatting']['Audio']]
         },
         fallbacks=[commands['End-Chat'],
                    commands['Main-Menu']],
