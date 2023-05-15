@@ -106,6 +106,10 @@ messages = {
                                       filters.ChatType.PRIVATE,
                                       callback=ChattingAudioCallback),
 
+        'Entry-Sticker': MessageHandler(filters.Sticker.ALL & chatting_filter &
+                                        filters.ChatType.PRIVATE,
+                                        callback=ChattingStickerCallback),
+
         'Text': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
                                callback=ChattingCallback),
 
@@ -113,7 +117,10 @@ messages = {
                                    callback=ChattingDocumentCallback),
 
         'Audio': MessageHandler(filters.AUDIO,
-                                callback=ChattingAudioCallback)
+                                callback=ChattingAudioCallback),
+
+        'Sticker': MessageHandler(filters.Sticker.ALL,
+                                  callback=ChattingStickerCallback)
     }
 }
 
@@ -308,11 +315,13 @@ conversations = {
         entry_points=[messages['Chatting']['Entry-Text'],
                       messages['Chatting']['Entry-Document'],
                       messages['Chatting']['Entry-Audio'],
+                      messages['Chatting']['Entry-Sticker'],
                       commands['End-Chat']],
         states={
             CHATTING: [messages['Chatting']['Text'],
                        messages['Chatting']['Document'],
-                       messages['Chatting']['Audio']]
+                       messages['Chatting']['Audio'],
+                       messages['Chatting']['Sticker']]
         },
         fallbacks=[commands['End-Chat'],
                    commands['Main-Menu']],
