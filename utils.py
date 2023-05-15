@@ -134,3 +134,27 @@ def GetChatRequestsGottenList(user_id):
                        )
 
     return results
+
+
+def GetReplyMessageId(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    bot_data = context.bot_data
+
+    this_user_id = update.effective_user.id
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    if 'message_ids' not in bot_data:
+        bot_data['message_ids'] = {}
+
+    if this_user_id not in bot_data['message_ids']:
+        bot_data['message_ids'][this_user_id] = {}
+
+    if other_user_id not in bot_data['message_ids']:
+        bot_data['message_ids'][other_user_id] = {}
+
+    reply_message = update.message.reply_to_message
+    reply_to_message_id = None
+
+    if reply_message and reply_message.message_id in bot_data['message_ids'][this_user_id]:
+        reply_to_message_id = bot_data['message_ids'][this_user_id][reply_message.message_id]
+
+    return reply_to_message_id

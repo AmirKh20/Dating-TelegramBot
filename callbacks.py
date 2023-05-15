@@ -531,21 +531,8 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     other_user_id = bot_data['chatting_with'][this_user_id]
 
-    if 'message_ids' not in bot_data:
-        bot_data['message_ids'] = {}
-
-    if this_user_id not in bot_data['message_ids']:
-        bot_data['message_ids'][this_user_id] = {}
-
-    if other_user_id not in bot_data['message_ids']:
-        bot_data['message_ids'][other_user_id] = {}
-
     message = update.message
-    reply_message = message.reply_to_message
-    reply_to_message_id = None
-
-    if reply_message and reply_message.message_id in bot_data['message_ids'][this_user_id]:
-        reply_to_message_id = bot_data['message_ids'][this_user_id][reply_message.message_id]
+    reply_to_message_id = GetReplyMessageId(update, context)
 
     message_bot_sent = await context.bot.send_message(chat_id=other_user_id,
                                                       text=message.text,
@@ -575,21 +562,7 @@ async def ChattingDocumentCallback(update: Update, context: ContextTypes.DEFAULT
     message = update.message
     document_file_id = message.document.file_id
     caption = message.caption
-
-    if 'message_ids' not in bot_data:
-        bot_data['message_ids'] = {}
-
-    if this_user_id not in bot_data['message_ids']:
-        bot_data['message_ids'][this_user_id] = {}
-
-    if other_user_id not in bot_data['message_ids']:
-        bot_data['message_ids'][other_user_id] = {}
-
-    reply_message = message.reply_to_message
-    reply_to_message_id = None
-
-    if reply_message and reply_message.message_id in bot_data['message_ids'][this_user_id]:
-        reply_to_message_id = bot_data['message_ids'][this_user_id][reply_message.message_id]
+    reply_to_message_id = GetReplyMessageId(update, context)
 
     message_bot_sent = await context.bot.send_document(chat_id=other_user_id,
                                                        document=document_file_id,
