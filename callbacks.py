@@ -532,14 +532,21 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     other_user_id = bot_data['chatting_with'][this_user_id]
 
     message = update.message
-    reply_to_message_id = GetReplyMessageId(update, context)
-
-    message_bot_sent = await context.bot.copy_message(chat_id=other_user_id,
-                                                      from_chat_id=this_user_id,
-                                                      message_id=message.message_id,
-                                                      write_timeout=30,
-                                                      connect_timeout=30,
-                                                      reply_to_message_id=reply_to_message_id)
+    # If the message is forwarded
+    if message.forward_date:
+        message_bot_sent = await context.bot.forward_message(chat_id=other_user_id,
+                                                             from_chat_id=this_user_id,
+                                                             message_id=message.message_id,
+                                                             write_timeout=30,
+                                                             connect_timeout=30)
+    else:
+        reply_to_message_id = GetReplyMessageId(update, context)
+        message_bot_sent = await context.bot.copy_message(chat_id=other_user_id,
+                                                          from_chat_id=this_user_id,
+                                                          message_id=message.message_id,
+                                                          write_timeout=30,
+                                                          connect_timeout=30,
+                                                          reply_to_message_id=reply_to_message_id)
 
     bot_data['message_ids'][other_user_id][message_bot_sent.message_id] = message.message_id
     bot_data['message_ids'][this_user_id][message.message_id] = message_bot_sent.message_id
