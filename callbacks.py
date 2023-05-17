@@ -637,6 +637,37 @@ async def ChattingStickerCallback(update: Update, context: ContextTypes.DEFAULT_
     return CHATTING
 
 
+async def CHattingPhotoCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
+
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    this_user_id = update.effective_user.id
+    if this_user_id not in bot_data['chatting_with']:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    message = update.message
+    photo_file_id = message.photo[0].file_id
+    caption = message.caption
+    reply_to_message_id = GetReplyMessageId(update, context)
+
+    message_bot_sent = await context.bot.send_photo(chat_id=other_user_id,
+                                                    photo=photo_file_id,
+                                                    caption=caption,
+                                                    write_timeout=30,
+                                                    connect_timeout=30,
+                                                    reply_to_message_id=reply_to_message_id)
+
+    bot_data['message_ids'][other_user_id][message_bot_sent.message_id] = message.message_id
+    bot_data['message_ids'][this_user_id][message.message_id] = message_bot_sent.message_id
+
+    return CHATTING
+
+
 async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not isinstance(update, Update):
         return
