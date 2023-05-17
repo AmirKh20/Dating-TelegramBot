@@ -94,40 +94,13 @@ messages = {
     },
 
     'Chatting': {
-        'Entry-Text': MessageHandler(filters.TEXT & chatting_filter &
-                                     filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
-                                     callback=ChattingCallback),
+        'Entry-Message': MessageHandler(filters.ALL & chatting_filter &
+                                        filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
+                                        callback=ChattingCallback),
 
-        'Entry-Document': MessageHandler(filters.Document.ALL & chatting_filter &
-                                         filters.ChatType.PRIVATE,
-                                         callback=ChattingDocumentCallback),
+        'Message': MessageHandler(filters.ALL & ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                  callback=ChattingCallback),
 
-        'Entry-Audio': MessageHandler(filters.AUDIO & chatting_filter &
-                                      filters.ChatType.PRIVATE,
-                                      callback=ChattingAudioCallback),
-
-        'Entry-Sticker': MessageHandler(filters.Sticker.ALL & chatting_filter &
-                                        filters.ChatType.PRIVATE,
-                                        callback=ChattingStickerCallback),
-
-        'Entry-Photo': MessageHandler(filters.PHOTO & chatting_filter &
-                                      filters.ChatType.PRIVATE,
-                                      callback=CHattingPhotoCallback),
-
-        'Text': MessageHandler(filters.TEXT & ~filters.Regex('^/end_chat$|^/main_menu$'),
-                               callback=ChattingCallback),
-
-        'Document': MessageHandler(filters.Document.ALL,
-                                   callback=ChattingDocumentCallback),
-
-        'Audio': MessageHandler(filters.AUDIO,
-                                callback=ChattingAudioCallback),
-
-        'Sticker': MessageHandler(filters.Sticker.ALL,
-                                  callback=ChattingStickerCallback),
-
-        'Photo': MessageHandler(filters.PHOTO,
-                                callback=CHattingPhotoCallback)
     }
 }
 
@@ -319,18 +292,10 @@ conversations = {
     },
 
     'Chatting': ConversationHandler(
-        entry_points=[messages['Chatting']['Entry-Text'],
-                      messages['Chatting']['Entry-Document'],
-                      messages['Chatting']['Entry-Audio'],
-                      messages['Chatting']['Entry-Sticker'],
-                      messages['Chatting']['Entry-Photo'],
+        entry_points=[messages['Chatting']['Entry-Message'],
                       commands['End-Chat']],
         states={
-            CHATTING: [messages['Chatting']['Text'],
-                       messages['Chatting']['Document'],
-                       messages['Chatting']['Audio'],
-                       messages['Chatting']['Sticker'],
-                       messages['Chatting']['Photo']]
+            CHATTING: [messages['Chatting']['Message']]
         },
         fallbacks=[commands['End-Chat'],
                    commands['Main-Menu']],
