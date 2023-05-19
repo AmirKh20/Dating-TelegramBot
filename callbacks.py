@@ -532,8 +532,7 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     other_user_id = bot_data['chatting_with'][this_user_id]
 
     message = update.message
-    # If the message is forwarded
-    if message.forward_date:
+    if message.forward_date:  # If the message is forwarded
         message_bot_sent = await context.bot.forward_message(chat_id=other_user_id,
                                                              from_chat_id=this_user_id,
                                                              message_id=message.message_id,
@@ -550,6 +549,48 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     bot_data['message_ids'][other_user_id][message_bot_sent.message_id] = message.message_id
     bot_data['message_ids'][this_user_id][message.message_id] = message_bot_sent.message_id
+
+    return CHATTING
+
+
+async def ChattingEditedMessageCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    this_user_id = update.effective_user.id
+    if this_user_id not in bot_data['chatting_with']:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    edited_message = update.edited_message
+    edited_message_id = GetEditedMessageId(update, context)
+
+    if edited_message_id:  # If an edited message id was found in the current chat
+        if not edited_message.text:  # If the user has edited the caption of a message
+            await context.bot.edit_message_caption(chat_id=other_user_id,
+                                                   message_id=edited_message_id,
+                                                   caption=edited_message.caption,
+                                                   caption_entities=edited_message.caption_entities,
+                                                   reply_markup=inline_keyboards['chatting']['edited_keyboard'])
+        else:
+            await context.bot.edit_message_text(chat_id=other_user_id,
+                                                message_id=edited_message_id,
+                                                text=edited_message.text,
+                                                entities=edited_message.entities,
+                                                reply_markup=inline_keyboards['chatting']['edited_keyboard'])
+
+    return CHATTING
+
+
+async def ChattingEditedMessageButtonCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    message_text = (
+        "این پیام ویرایش شده است!"
+    )
+    await query.answer(text=message_text)
 
     return CHATTING
 

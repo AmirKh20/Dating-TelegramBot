@@ -94,12 +94,23 @@ messages = {
     },
 
     'Chatting': {
-        'Entry-Message': MessageHandler(filters.ALL & chatting_filter &
-                                        filters.ChatType.PRIVATE & ~filters.Regex('^/end_chat$'),
+        'Entry-Message': MessageHandler(~filters.UpdateType.EDITED_MESSAGE & filters.ALL &
+                                        chatting_filter & filters.ChatType.PRIVATE &
+                                        ~filters.Regex('^/end_chat$'),
                                         callback=ChattingCallback),
 
-        'Message': MessageHandler(filters.ALL & ~filters.Regex('^/end_chat$|^/main_menu$'),
+        'Entry-Message-Edited': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.ALL &
+                                               chatting_filter & filters.ChatType.PRIVATE &
+                                               ~filters.Regex('^/end_chat$'),
+                                               callback=ChattingEditedMessageCallback),
+
+        'Message': MessageHandler(~filters.UpdateType.EDITED_MESSAGE & filters.ALL &
+                                  ~filters.Regex('^/end_chat$|^/main_menu$'),
                                   callback=ChattingCallback),
+
+        'Message-Edited': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.ALL &
+                                         ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                         callback=ChattingEditedMessageCallback),
 
     }
 }
@@ -293,9 +304,14 @@ conversations = {
 
     'Chatting': ConversationHandler(
         entry_points=[messages['Chatting']['Entry-Message'],
+                      messages['Chatting']['Entry-Message-Edited'],
                       commands['End-Chat']],
         states={
-            CHATTING: [messages['Chatting']['Message']]
+            CHATTING: [messages['Chatting']['Message'],
+                       messages['Chatting']['Message-Edited'],
+                       CallbackQueryHandler(pattern='^chatting_edited_message$',
+                                            callback=ChattingEditedMessageButtonCallback)
+                       ]
         },
         fallbacks=[commands['End-Chat'],
                    commands['Main-Menu']],

@@ -188,5 +188,11 @@ inline_keyboards = {
                 ])
             }
         }
+    },
+
+    'chatting': {
+        'edited_keyboard': InlineKeyboardMarkup([
+            [InlineKeyboardButton('ویرایش شده', callback_data='chatting_edited_message')]
+        ])
     }
 }
