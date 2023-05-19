@@ -11,6 +11,7 @@ QA_GROUP_ID: chat_id for the QA group.
 QA_CHANNEL: username of the channel which questions are posted.
 SUPPORT_GROUP_ID: chat_id for the support group.
 BOT_USERNAME: the bot username with @ before it: @botusername
+COINS_PRICE: the price of the coins.
 """
 
 import logging
