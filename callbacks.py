@@ -1147,7 +1147,7 @@ async def FinancialChargeCallback(update: Update, context: ContextTypes.DEFAULT_
     # Read the data from the Web App
     web_app_data = json.loads(update.effective_message.web_app_data.data)
 
-    number_of_coins, price = 0, 0.0
+    number_of_coins, price = 0, 0
 
     if 'coins' in web_app_data:  # If the user didn't select a plan
         number_of_coins = web_app_data['coins']
