@@ -99,19 +99,42 @@ messages = {
                                         ~filters.Regex('^/end_chat$'),
                                         callback=ChattingCallback),
 
-        'Entry-Message-Edited': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.ALL &
-                                               chatting_filter & filters.ChatType.PRIVATE &
-                                               ~filters.Regex('^/end_chat$'),
-                                               callback=ChattingEditedMessageCallback),
+        'Entry-Message-Edited': {
+            'Text': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.TEXT &
+                                   chatting_filter & filters.ChatType.PRIVATE &
+                                   ~filters.Regex('^/end_chat$'),
+                                   callback=ChattingEditedTextCallback),
+
+            'Media': MessageHandler(filters.UpdateType.EDITED_MESSAGE & (
+                    filters.ANIMATION | filters.AUDIO | filters.Document.ALL | filters.PHOTO | filters.VIDEO) &
+                                    chatting_filter & filters.ChatType.PRIVATE &
+                                    ~filters.Regex('^/end_chat$'),
+                                    callback=ChattingEditedMediaCallback),
+
+            'Caption': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.CAPTION &
+                                      chatting_filter & filters.ChatType.PRIVATE &
+                                      ~filters.Regex('^/end_chat$'),
+                                      callback=ChattingEditedCaptionCallback)
+        },
 
         'Message': MessageHandler(~filters.UpdateType.EDITED_MESSAGE & filters.ALL &
                                   ~filters.Regex('^/end_chat$|^/main_menu$'),
                                   callback=ChattingCallback),
 
-        'Message-Edited': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.ALL &
-                                         ~filters.Regex('^/end_chat$|^/main_menu$'),
-                                         callback=ChattingEditedMessageCallback),
+        'Message-Edited': {
+            'Text': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.TEXT &
+                                   ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                   callback=ChattingEditedTextCallback),
 
+            'Media': MessageHandler(filters.UpdateType.EDITED_MESSAGE & (
+                    filters.ANIMATION | filters.AUDIO | filters.Document.ALL | filters.PHOTO | filters.VIDEO) &
+                                    ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                    callback=ChattingEditedMediaCallback),
+
+            'Caption': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.CAPTION &
+                                      ~filters.Regex('^/end_chat$|^/main_menu$'),
+                                      callback=ChattingEditedCaptionCallback)
+        }
     }
 }
 
@@ -304,11 +327,15 @@ conversations = {
 
     'Chatting': ConversationHandler(
         entry_points=[messages['Chatting']['Entry-Message'],
-                      messages['Chatting']['Entry-Message-Edited'],
+                      messages['Chatting']['Entry-Message-Edited']['Text'],
+                      messages['Chatting']['Entry-Message-Edited']['Media'],
+                      messages['Chatting']['Entry-Message-Edited']['Caption'],
                       commands['End-Chat']],
         states={
             CHATTING: [messages['Chatting']['Message'],
-                       messages['Chatting']['Message-Edited'],
+                       messages['Chatting']['Message-Edited']['Text'],
+                       messages['Chatting']['Message-Edited']['Media'],
+                       messages['Chatting']['Message-Edited']['Caption'],
                        CallbackQueryHandler(pattern='^chatting_edited_message$',
                                             callback=ChattingEditedMessageButtonCallback)
                        ]

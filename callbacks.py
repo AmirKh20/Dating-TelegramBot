@@ -1,7 +1,15 @@
 import json
 import logging
 
-from telegram import ForceReply, error
+from telegram import (
+    ForceReply,
+    error,
+    InputMediaAnimation,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaPhoto,
+    InputMediaVideo
+)
 from telegram.ext import ConversationHandler
 
 from keyboard_buttons import button_keyboards, inline_keyboards
@@ -553,7 +561,7 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     return CHATTING
 
 
-async def ChattingEditedMessageCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def ChattingEditedTextCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -569,18 +577,88 @@ async def ChattingEditedMessageCallback(update: Update, context: ContextTypes.DE
     edited_message_id = GetEditedMessageId(update, context)
 
     if edited_message_id:  # If an edited message id was found in the current chat
-        if not edited_message.text:  # If the user has edited the caption of a message
-            await context.bot.edit_message_caption(chat_id=other_user_id,
-                                                   message_id=edited_message_id,
-                                                   caption=edited_message.caption,
-                                                   caption_entities=edited_message.caption_entities,
-                                                   reply_markup=inline_keyboards['chatting']['edited_keyboard'])
-        else:
-            await context.bot.edit_message_text(chat_id=other_user_id,
-                                                message_id=edited_message_id,
-                                                text=edited_message.text,
-                                                entities=edited_message.entities,
-                                                reply_markup=inline_keyboards['chatting']['edited_keyboard'])
+        await context.bot.edit_message_text(chat_id=other_user_id,
+                                            message_id=edited_message_id,
+                                            text=edited_message.text,
+                                            entities=edited_message.entities,
+                                            reply_markup=inline_keyboards['chatting']['edited_keyboard'])
+
+    return CHATTING
+
+
+async def ChattingEditedMediaCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    this_user_id = update.effective_user.id
+    if this_user_id not in bot_data['chatting_with']:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    edited_message = update.edited_message
+    edited_message_id = GetEditedMessageId(update, context)
+    if not edited_message_id:  # If an edited message id was not found in the current chat
+        return CHATTING
+
+    input_media = None
+    if edited_message.animation:
+        input_media = InputMediaAnimation(media=edited_message.animation.file_id,
+                                          caption=edited_message.caption,
+                                          caption_entities=edited_message.caption_entities,
+                                          has_spoiler=edited_message.has_media_spoiler)
+    elif edited_message.audio:
+        input_media = InputMediaAudio(media=edited_message.audio.file_id,
+                                      caption=edited_message.caption,
+                                      caption_entities=edited_message.caption_entities)
+    elif edited_message.document:
+        input_media = InputMediaDocument(media=edited_message.document.file_id,
+                                         caption=edited_message.caption,
+                                         caption_entities=edited_message.caption_entities)
+    elif edited_message.photo:
+        input_media = InputMediaPhoto(media=edited_message.photo[0].file_id,
+                                      caption=edited_message.caption,
+                                      caption_entities=edited_message.caption_entities,
+                                      has_spoiler=edited_message.has_media_spoiler)
+    elif edited_message.video:
+        input_media = InputMediaVideo(media=edited_message.video.file_id,
+                                      caption=edited_message.caption,
+                                      caption_entities=edited_message.caption_entities,
+                                      has_spoiler=edited_message.has_media_spoiler)
+    else:
+        return CHATTING
+
+    await context.bot.edit_message_media(media=input_media,
+                                         chat_id=other_user_id,
+                                         message_id=edited_message_id,
+                                         reply_markup=inline_keyboards['chatting']['edited_keyboard'])
+
+    return CHATTING
+
+
+async def ChattingEditedCaptionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    bot_data = context.bot_data
+    if 'chatting_with' not in bot_data:
+        bot_data['chatting_with'] = {}
+
+    this_user_id = update.effective_user.id
+    if this_user_id not in bot_data['chatting_with']:
+        await SendMessage(update, context, text='شما در حال چت با کسی نیستید!')
+        return END
+
+    other_user_id = bot_data['chatting_with'][this_user_id]
+
+    edited_message = update.edited_message
+    edited_message_id = GetEditedMessageId(update, context)
+
+    if edited_message_id:  # If an edited message id was found in the current chat
+        await context.bot.edit_message_caption(chat_id=other_user_id,
+                                               message_id=edited_message_id,
+                                               caption=edited_message.caption,
+                                               caption_entities=edited_message.caption_entities,
+                                               reply_markup=inline_keyboards['chatting']['edited_keyboard'])
 
     return CHATTING
 
