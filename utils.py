@@ -21,6 +21,7 @@ QA_GROUP_ID = int(getenv('QA_GROUP_ID'))
 QA_CHANNEL = getenv('QA_CHANNEL')
 SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
 BOT_USERNAME = getenv('BOT_USERNAME')
+COINS_PRICE = float(getenv('COINS_PRICE'))
 
 try:
     with open('chatting_filter.pkl', 'rb') as pkl_file:

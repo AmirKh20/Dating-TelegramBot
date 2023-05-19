@@ -1139,19 +1139,31 @@ async def FinancialReceiveMoneyEnterCardCallback(update: Update, context: Contex
 async def FinancialChargeCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Runs when شارژ سکه و الماس has been clicked and the user went to the web app for this button.
-    The bot reads the gems and coins from web app and ask the user to pay.
+    The bot reads the gems and coins from web app and asks the user to pay.
     """
     if not await CheckSubs(update, context):
         return END
 
-    data = json.loads(update.effective_message.web_app_data.data)
+    # Read the data from the Web App
+    web_app_data = json.loads(update.effective_message.web_app_data.data)
+
+    number_of_coins, price = 0, 0.0
+
+    if 'coins' in web_app_data:  # If the user didn't select a plan
+        number_of_coins = web_app_data['coins']
+        price = COINS_PRICE * int(number_of_coins)
+
+    elif 'plan' in web_app_data:  # If the user has selected a plan
+        number_of_coins = web_app_data['plan']['coins']
+        price = web_app_data['plan']['price']
 
     text = (
         "شما "
-        f"{data['Gems']} "
-        "الماس و "
-        f"{data['Coins']} "
-        "سکه انتخاب کردید. برای پرداخت روی گزینه پرداخت کلیک کنید."
+        f"{number_of_coins} "
+        "سکه انتخاب کردید. "
+        "هزینه پرداختی: "
+        f"{price}\n"
+        "برای پرداخت روی گزینه پرداخت کلیک کنید."
     )
     await ReplyMessage(update, text=text, reply_keyboard_markup=inline_keyboards['financial']['charge'])
 
