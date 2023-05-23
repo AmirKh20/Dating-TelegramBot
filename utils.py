@@ -1,5 +1,6 @@
 import pickle
 from os import getenv
+from typing import List, Union
 from uuid import uuid4
 
 from dotenv import load_dotenv
@@ -7,6 +8,7 @@ from telegram import (
     Update,
     InlineQueryResultArticle,
     InputTextMessageContent,
+    Message,
 )
 from telegram.ext import (
     ContextTypes,
@@ -22,6 +24,22 @@ QA_CHANNEL = getenv('QA_CHANNEL')
 SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
 BOT_USERNAME = getenv('BOT_USERNAME')
 COINS_PRICE = int(getenv('COINS_PRICE'))
+FINANCIAL_RECEIVE_MONEY_URL = getenv('FINANCIAL_RECEIVE_MONEY_URL')
+
+
+# A MessageFilter class for filtering based on web app button texts
+class WebAppButtonText(filters.MessageFilter):
+    __slots__ = ["strings"]
+
+    def __init__(self, strings: Union[str, List[str]]):
+        super().__init__()
+        self.strings = strings
+
+    def filter(self, message: Message) -> bool:
+        if message.web_app_data and message.web_app_data.button_text:
+            return message.web_app_data.button_text in self.strings
+        return False
+
 
 try:
     with open('chatting_filter.pkl', 'rb') as pkl_file:

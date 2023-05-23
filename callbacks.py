@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 
 from telegram import (
     ForceReply,
@@ -19,45 +20,41 @@ logger = logging.getLogger('__main__')
 
 # States in the conversation handlers
 
-MAIN_MENU_STATE = 0
+(MAIN_MENU_STATE,
 
-HAMSAN_GOZINI_MENU = 1
+ HAMSAN_GOZINI_MENU,
 
-(PROFILE,
+ PROFILE,
  PROFILE_CONTACTS,
  PROFILE_LIKERS,
- PROFILE_BLOCKS
- ) = range(2, 6)
+ PROFILE_BLOCKS,
 
-FINANCIAL = 6
+ FINANCIAL,
 
-(FINANCIAL_CHANGES,
+ FINANCIAL_CHANGES,
  FINANCIAL_CHANGES_GEMS_TO_COINS,
  FINANCIAL_CHANGES_COINS_TO_GEMS,
  FINANCIAL_CHANGES_GIFTS_TO_COINS,
- FINANCIAL_CHANGES_GIFTS_TO_GEMS
- ) = range(7, 12)
+ FINANCIAL_CHANGES_GIFTS_TO_GEMS,
 
-(FINANCIAL_RECEIVE_MONEY,
- FINANCIAL_RECEIVE_MONEY_ENTER_CARD
- ) = range(12, 14)
+ FINANCIAL_RECEIVE_MONEY,
 
-CONSULTATION = 14
+ CONSULTATION,
 
-(CONSULTATION_QA,
+ CONSULTATION_QA,
  CONSULTATION_QA_ENTER_QUESTION,
- ) = range(15, 17)
 
-SUPPORT = 17
+ SUPPORT,
 
-HAMSAN_GOZINI_CHAT_REQUESTS = 18
+ HAMSAN_GOZINI_CHAT_REQUESTS,
 
-CHAT_REQUESTS_GIVEN = 19
-CHAT_REQUESTS_GIVEN_PROFILE = 20
-CHAT_REQUESTS_GOTTEN = 21
-CHAT_REQUESTS_GOTTEN_PROFILE = 22
+ CHAT_REQUESTS_GIVEN,
+ CHAT_REQUESTS_GIVEN_PROFILE,
+ CHAT_REQUESTS_GOTTEN,
+ CHAT_REQUESTS_GOTTEN_PROFILE,
 
-CHATTING = 23
+ CHATTING
+ ) = range(0, 23)
 
 END = ConversationHandler.END
 
@@ -1092,46 +1089,65 @@ async def FinancialChangesGiftsToGemsReadGiftsCallback(update: Update, context: 
 
 async def FinancialReceiveMoneyCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when دریافت وجه is sent in the financial conversation handler.
+    Runs when دریافت وجه is clicked in the financial keyboard.
     """
-    if not await CheckSubs(update, context):
-        return END
+    # Read the data from the Web App
+    web_app_data = json.loads(update.effective_message.web_app_data.data)
 
-    await ReplyMessage(update, text='نمایش تعداد موجودی گیفت ها و هزینه ریالی...',
-                       reply_keyboard_markup=inline_keyboards['financial']['receive-money_keyboard'])
+    selected_gifts = web_app_data['gifts']
+    card_number = web_app_data['card_number']
+
+    # TODO: Check for every gifts in the users' gifts in db and add their price to amount_to_pay
+    amount_to_pay = 0
+    for gift in selected_gifts:
+        if gift == 'coffee':
+            amount_to_pay += 23000
+        elif gift == 'teddy-bear':
+            amount_to_pay += 67000
+
+    message_text = (
+        "مبلغ دریافتی: "
+        f"`{amount_to_pay}`\n"
+        "شماره کارت: "
+        f"`{card_number}`"
+    )
+    await ReplyMessage(update,
+                       text=message_text,
+                       reply_keyboard_markup=inline_keyboards['financial']['receive-money_confirm'],
+                       **{'parse_mode': 'MarkdownV2'})
 
     return FINANCIAL_RECEIVE_MONEY
 
 
-async def FinancialReceiveMoneyCallbackQuery(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def FinancialReceiveMoneyConfirmCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when برداشت وجه is clicked and it wants the user's card info.
+    Runs after the user has confirmed their money amount and card number.
+    This function sends the amount_to_pay and card_number variables to a table in the database.
     """
-    if not await CheckSubs(update, context):
-        return END
-
     query = update.callback_query
+    message = query.message
+    amount_to_pay = int(re.findall('مبلغ دریافتی:.+', message.text)[0].split()[-1])
+    card_number = re.findall('شماره کارت:.+', message.text)[0].split()[-1]
+
+    # Read the data from the replied Web App message
+    web_app_data = json.loads(message.reply_to_message.web_app_data.data)
+    selected_gifts = web_app_data['gifts']
+
+    # TODO: Send amount_to_pay and card_number to db
+    # TODO: Remove gifts from users_gifts table for the user
+
     await query.answer()
 
-    text = 'شماره کارت خود را همراه مشخصات وارد کنید:'
-    await SendMessage(update, context, text=text, reply_markup=ForceReply())
-
-    return FINANCIAL_RECEIVE_MONEY_ENTER_CARD
-
-
-async def FinancialReceiveMoneyEnterCardCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """
-    Runs when برداشت وجه has been clicked and it reads the user's card info.
-    """
-    if not await CheckSubs(update, context):
-        return END
-
-    card = update.message.text
-
-    await ReplyMessage(update, text='لطفا تا اطلاع ثانویه صبر کنید..')
-    await ReplyMessage(update, text=f'واریزی ... برای کارت\n{card}\nموفقیت آمیز بود.')
-    await SendMessage(update, context, text='موجودی:',
-                      reply_markup=button_keyboards['financial_keyboard'])
+    message_sent_to_user = (
+        "درخواست شما برای دریافت وجه با\n"
+        "مبلغ دریافتی: "
+        f"`{amount_to_pay}`\n"
+        "شماره کارت: "
+        f"`{card_number}`\n"
+        "فرستاده شد\. منتظر جواب بمانید\."
+    )
+    await query.edit_message_text(text=message_sent_to_user,
+                                  parse_mode='MarkdownV2')
 
     return FINANCIAL
 

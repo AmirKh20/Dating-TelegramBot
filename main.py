@@ -12,6 +12,7 @@ QA_CHANNEL: username of the channel which questions are posted.
 SUPPORT_GROUP_ID: chat_id for the support group.
 BOT_USERNAME: the bot username with @ before it: @botusername
 COINS_PRICE: the price of the coins.
+FINANCIAL_RECEIVE_MONEY_URL: the url for financial receive button
 """
 
 import logging

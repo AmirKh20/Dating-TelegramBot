@@ -57,15 +57,11 @@ messages = {
             'Gifts-To-Gems': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
                                             FinancialChangesGiftsToGemsReadGiftsCallback)
         },
-        'Receive-Money': {
-            'Menu': MessageHandler(filters.Regex('^دریافت وجه$'), FinancialReceiveMoneyCallback),
+        'Receive-Money': MessageHandler(filters.StatusUpdate.WEB_APP_DATA & WebAppButtonText('دریافت وجه'),
+                                        FinancialReceiveMoneyCallback),
 
-            # Every text message that is replied to the bots' message in the bot.
-            'Enter-Card': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
-                                         FinancialReceiveMoneyEnterCardCallback)
-        },
         # Web app handler for charging coins and gems
-        'Charge': MessageHandler(filters.StatusUpdate.WEB_APP_DATA,
+        'Charge': MessageHandler(filters.StatusUpdate.WEB_APP_DATA & WebAppButtonText('شارژ سکه و الماس'),
                                  FinancialChargeCallback),
     },
 
@@ -200,7 +196,7 @@ conversations = {
             FINANCIAL: [messages['Financial']['Buy-Plan'],
                         messages['Financial']['Balance'],
                         messages['Financial']['Changes']['Menu'],
-                        messages['Financial']['Receive-Money']['Menu'],
+                        messages['Financial']['Receive-Money'],
                         messages['Financial']['Charge']],
 
             FINANCIAL_CHANGES: [CallbackQueryHandler(pattern='^gems_to_coins$',
@@ -217,10 +213,8 @@ conversations = {
             FINANCIAL_CHANGES_GIFTS_TO_COINS: [messages['Financial']['Changes']['Gifts-To-Coins']],
             FINANCIAL_CHANGES_GIFTS_TO_GEMS: [messages['Financial']['Changes']['Gifts-To-Gems']],
 
-            FINANCIAL_RECEIVE_MONEY: [CallbackQueryHandler(pattern='^receive-money$',
-                                                           callback=FinancialReceiveMoneyCallbackQuery)],
-
-            FINANCIAL_RECEIVE_MONEY_ENTER_CARD: [messages['Financial']['Receive-Money']['Enter-Card']],
+            FINANCIAL_RECEIVE_MONEY: [CallbackQueryHandler(pattern='^receive-money_confirm$',
+                                                           callback=FinancialReceiveMoneyConfirmCallback)]
         },
         fallbacks=[commands['Main-Menu'],
                    commands['Start'],
@@ -229,7 +223,7 @@ conversations = {
                    messages['Financial']['Buy-Plan'],
                    messages['Financial']['Balance'],
                    messages['Financial']['Changes']['Menu'],
-                   messages['Financial']['Receive-Money']['Menu'],
+                   messages['Financial']['Receive-Money'],
                    messages['Financial']['Charge']],
         map_to_parent={
             MAIN_MENU_STATE: MAIN_MENU_STATE,

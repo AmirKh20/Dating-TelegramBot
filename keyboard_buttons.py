@@ -7,7 +7,7 @@ from telegram import (
     WebAppInfo,
 )
 
-from utils import WEBSITE_URL, FINANCIAL_CHARGE_URL
+from utils import WEBSITE_URL, FINANCIAL_CHARGE_URL, FINANCIAL_RECEIVE_MONEY_URL
 
 button_keyboards = {
     'no_keyboard': ReplyKeyboardRemove(),
@@ -26,7 +26,7 @@ button_keyboards = {
 
     'financial_keyboard': ReplyKeyboardMarkup([
         [KeyboardButton('موجودی'), KeyboardButton('خرید پلن')],
-        [KeyboardButton('دریافت وجه'), KeyboardButton('تبدیل')],
+        [KeyboardButton('دریافت وجه', web_app=WebAppInfo(url=FINANCIAL_RECEIVE_MONEY_URL)), KeyboardButton('تبدیل')],
         [KeyboardButton('شارژ سکه و الماس', web_app=WebAppInfo(url=FINANCIAL_CHARGE_URL))],
         [KeyboardButton('بازگشت به منوی اصلی')]
     ]),
@@ -92,8 +92,8 @@ inline_keyboards = {
              InlineKeyboardButton('گیفت به الماس', callback_data='gifts_to_gems')]
         ]),
 
-        'receive-money_keyboard': InlineKeyboardMarkup([
-            [InlineKeyboardButton('برداشت وجه', callback_data='receive-money')]
+        'receive-money_confirm': InlineKeyboardMarkup([
+            [InlineKeyboardButton('تایید', callback_data='receive-money_confirm')]
         ]),
 
         'buy-plan': InlineKeyboardMarkup([
