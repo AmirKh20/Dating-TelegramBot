@@ -25,6 +25,7 @@ SUPPORT_GROUP_ID = int(getenv('SUPPORT_GROUP_ID'))
 BOT_USERNAME = getenv('BOT_USERNAME')
 COINS_PRICE = int(getenv('COINS_PRICE'))
 FINANCIAL_RECEIVE_MONEY_URL = getenv('FINANCIAL_RECEIVE_MONEY_URL')
+CHATBOT_URL = getenv('CHATBOT_URL')
 
 
 # A MessageFilter class for filtering based on web app button texts

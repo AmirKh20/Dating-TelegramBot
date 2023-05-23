@@ -7,7 +7,12 @@ from telegram import (
     WebAppInfo,
 )
 
-from utils import WEBSITE_URL, FINANCIAL_CHARGE_URL, FINANCIAL_RECEIVE_MONEY_URL
+from utils import (
+    WEBSITE_URL,
+    FINANCIAL_CHARGE_URL,
+    FINANCIAL_RECEIVE_MONEY_URL,
+    CHATBOT_URL
+)
 
 button_keyboards = {
     'no_keyboard': ReplyKeyboardRemove(),
@@ -20,7 +25,7 @@ button_keyboards = {
     ]),
 
     'consultation_keyboard': ReplyKeyboardMarkup([
-        [KeyboardButton('چت بات'), KeyboardButton('روانشناس')],
+        [KeyboardButton('چت بات', web_app=WebAppInfo(url=CHATBOT_URL)), KeyboardButton('روانشناس')],
         [KeyboardButton('بازگشت به منوی اصلی'), KeyboardButton('پرسش و پاسخ')]
     ]),
 
