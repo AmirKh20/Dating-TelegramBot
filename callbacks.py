@@ -92,11 +92,33 @@ async def ConsultationEntryCallback(update: Update, context: ContextTypes.DEFAUL
 
 async def ConsultationTherapistCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when روانشناس is sent.
+    Runs when روانشناس is clicked.
     """
-    await ReplyMessage(update, 'روانشناس', button_keyboards['no_keyboard'])
-    await CheckSubs(update, context)
-    return END
+    web_app_data = json.loads(update.effective_message.web_app_data.data)
+
+    name = web_app_data['name']
+    email = web_app_data['email']
+    phone_number = web_app_data['phone_number']
+    doctor = web_app_data['doctor']
+    date = web_app_data['date']
+
+    message_text = (
+        "درخواست روانشناس به نام "
+        f"`{name}`, "
+        "با ایمیل "
+        f"`{email}`, "
+        "شماره تلفن: "
+        f"`{phone_number}`, "
+        "برای دکتر "
+        f"`{doctor}`, "
+        "به تاریخ: "
+        f"`{date}` "
+        "ثبت شد\."
+    )
+    await ReplyMessage(update,
+                       text=message_text,
+                       **{'parse_mode': 'MarkdownV2'})
+    return CONSULTATION
 
 
 async def ConsultationQACallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

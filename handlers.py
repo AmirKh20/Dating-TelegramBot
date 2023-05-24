@@ -28,7 +28,8 @@ messages = {
 
     'Consultation': {
         'Menu': MessageHandler(filters.Regex('^مشاوره$'), ConsultationEntryCallback),
-        'Therapist': MessageHandler(filters.Regex('^روانشناس$'), ConsultationTherapistCallback),
+        'Therapist': MessageHandler(filters.StatusUpdate.WEB_APP_DATA & WebAppButtonText('روانشناس'),
+                                    ConsultationTherapistCallback),
         'QA': {
             'Menu': MessageHandler(filters.Regex('^پرسش و پاسخ$'), ConsultationQACallback),
 

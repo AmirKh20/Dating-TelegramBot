@@ -14,6 +14,7 @@ BOT_USERNAME: the bot username with @ before it: @botusername
 COINS_PRICE: the price of the coins.
 FINANCIAL_RECEIVE_MONEY_URL: the url for financial receive button
 CHATBOT_URL: the url for Chatbot button
+THERAPISTS_URL: the url for Therapist button
 """
 
 import logging

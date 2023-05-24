@@ -11,7 +11,8 @@ from utils import (
     WEBSITE_URL,
     FINANCIAL_CHARGE_URL,
     FINANCIAL_RECEIVE_MONEY_URL,
-    CHATBOT_URL
+    CHATBOT_URL,
+    THERAPISTS_URL
 )
 
 button_keyboards = {
@@ -25,7 +26,8 @@ button_keyboards = {
     ]),
 
     'consultation_keyboard': ReplyKeyboardMarkup([
-        [KeyboardButton('چت بات', web_app=WebAppInfo(url=CHATBOT_URL)), KeyboardButton('روانشناس')],
+        [KeyboardButton('چت بات', web_app=WebAppInfo(url=CHATBOT_URL)),
+         KeyboardButton('روانشناس', web_app=WebAppInfo(url=THERAPISTS_URL))],
         [KeyboardButton('بازگشت به منوی اصلی'), KeyboardButton('پرسش و پاسخ')]
     ]),
 
