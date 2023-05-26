@@ -34,7 +34,8 @@ messages = {
             'Menu': MessageHandler(filters.Regex('^پرسش و پاسخ$'), ConsultationQACallback),
 
             # Every text message that is replied to the bots' message in the bot.
-            'Enter-Question': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
+            'Enter-Question': MessageHandler(filters.TEXT & filters.REPLY &
+                                             ~filters.COMMAND,
                                              ConsultationQAEnterQuestionCallback),
         }
     },
@@ -71,12 +72,13 @@ messages = {
         'Main': MessageHandler(filters.Regex('^پشتیبانی$'), SupportEntryCallback),
 
         # Every text message that is replied to the bots' message in the bot.
-        'Enter-Ticket': MessageHandler(filters.TEXT & filters.REPLY & ~filters.COMMAND,
+        'Enter-Ticket': MessageHandler(filters.TEXT & filters.REPLY &
+                                       ~filters.COMMAND,
                                        SupportEnterTicketCallback),
 
         # Every text message that is replied to the bots' message in the Support Group.
-        'Answer-Ticket': MessageHandler(filters.TEXT & filters.REPLY
-                                        & ~filters.COMMAND & filters.Chat(chat_id=SUPPORT_GROUP_ID),
+        'Answer-Ticket': MessageHandler(filters.TEXT & filters.REPLY &
+                                        ~filters.COMMAND & filters.Chat(chat_id=SUPPORT_GROUP_ID),
                                         SupportAnswerTicketCallback)
     },
 
@@ -84,17 +86,21 @@ messages = {
         'Chat-Requests': {
             'Given': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست داده به:'),
                                     callback=ChatRequestsGivenMenuCallback),
+
             'Gotten': MessageHandler(filters.ViaBot(username=BOT_USERNAME) & filters.Regex('^درخواست گرفته از:'),
                                      callback=ChatRequestsGottenMenuCallback)
         }
     },
 
+    # Message handlers for chatting between users
     'Chatting': {
+        # Entry message handlers which contain chatting_filter
         'Entry-Message': MessageHandler(~filters.UpdateType.EDITED_MESSAGE & filters.ALL &
                                         chatting_filter & filters.ChatType.PRIVATE &
                                         ~filters.Regex('^/end_chat$'),
                                         callback=ChattingCallback),
 
+        # Entry messages which are edited
         'Entry-Message-Edited': {
             'Text': MessageHandler(filters.UpdateType.EDITED_MESSAGE & filters.TEXT &
                                    chatting_filter & filters.ChatType.PRIVATE &
@@ -137,7 +143,6 @@ messages = {
 # Conversation handlers that modify the workflow of the bot
 conversations = {
     # This handler starts when همسان گزینی is sent in the parent conversation handler.
-    # The user clicks on a province after it.
     'Hamsan-Gozini': ConversationHandler(
         entry_points=[messages['Hamsan-Gozini']],
         states={
@@ -273,6 +278,7 @@ conversations = {
         name='support_conversation'
     ),
 
+    # For given/gotten chat requests after selecting a user in an inline query
     'Chat-Requests': {
         'Given': ConversationHandler(
             entry_points=[messages['User-Profile']['Chat-Requests']['Given']],
@@ -317,6 +323,7 @@ conversations = {
         ),
     },
 
+    # For handling messages in a chat between users
     'Chatting': ConversationHandler(
         entry_points=[messages['Chatting']['Entry-Message'],
                       messages['Chatting']['Entry-Message-Edited']['Text'],
@@ -364,8 +371,10 @@ accept_question_query_handler = CallbackQueryHandler(pattern='^accept_question$'
 reject_question_query_handler = CallbackQueryHandler(pattern='^reject_question$',
                                                      callback=ConsultationQARejectQuestionCallback)
 
+# Inline query handler for listing given chat requests
 given_list_inline_query_handler = InlineQueryHandler(pattern='^درخواست های داده شده:.*$',
                                                      callback=HamsanGoziniChatRequestsGivenListCallback)
 
+# Inline query handler for listing gotten chat requests
 gotten_list_inline_query_handler = InlineQueryHandler(pattern='^درخواست های گرفته شده:.*$',
                                                       callback=HamsanGoziniChatRequestsGottenListCallback)

@@ -47,9 +47,12 @@ def main():
         .write_timeout(20.0) \
         .build()
 
+    # Conversation handler for chatting between users
     application.add_handler(handlers.conversations['Chatting'])
 
+    # Parent conversation handler for every button
     application.add_handler(handlers.conversations['Starting'])
+
     application.add_handler(handlers.commands['Help'])
     application.add_handler(handlers.messages['Main-Menu'])
 
@@ -60,9 +63,11 @@ def main():
     # Handler for answering the tickets in the Support Group
     application.add_handler(handlers.messages['Support']['Answer-Ticket'])
 
+    # Handlers for showing the users' given/gotten chat requests list
     application.add_handler(handlers.given_list_inline_query_handler)
     application.add_handler(handlers.gotten_list_inline_query_handler)
 
+    # Conversation handlers which show other users' options when clicking on a user in the given/gotten list
     application.add_handlers([handlers.conversations['Chat-Requests']['Given'],
                               handlers.conversations['Chat-Requests']['Gotten']])
 

@@ -19,7 +19,6 @@ from utils import *
 logger = logging.getLogger('__main__')
 
 # States in the conversation handlers
-
 (MAIN_MENU_STATE,
 
  HAMSAN_GOZINI_MENU,
@@ -321,6 +320,9 @@ async def HamsanGoziniEntryCallback(update: Update, context: ContextTypes.DEFAUL
 
 
 async def HamsanGoziniChatRequestsListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user clicks on لیست درخواست ها in the hamsan-gozini menu
+    """
     if not await CheckSubs(update, context):
         return END
 
@@ -337,6 +339,9 @@ async def HamsanGoziniChatRequestsListCallback(update: Update, context: ContextT
 
 
 async def HamsanGoziniGoBackMenu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user wants to go back to the hamsan-gozini menu
+    """
     query = update.callback_query
     await query.answer()
 
@@ -350,6 +355,9 @@ async def HamsanGoziniGoBackMenu(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Inline query handler for listing the users' given chat requests
+    """
     if not await CheckSubs(update, context):
         return
 
@@ -361,6 +369,9 @@ async def HamsanGoziniChatRequestsGivenListCallback(update: Update, context: Con
 
 
 async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Inline query handler for listing the users' gotten chat requests
+    """
     if not await CheckSubs(update, context):
         return
 
@@ -372,6 +383,10 @@ async def HamsanGoziniChatRequestsGottenListCallback(update: Update, context: Co
 
 
 async def ChatRequestsGivenMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user clicks on one of their given chat requests.
+    This function shows some options for that user.
+    """
     other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
 
     message_text = (
@@ -387,6 +402,9 @@ async def ChatRequestsGivenMenuCallback(update: Update, context: ContextTypes.DE
 
 
 async def ChatRequestsGivenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user wants to see the profile of a given chat request
+    """
     query = update.callback_query
     await query.answer()
 
@@ -403,6 +421,9 @@ async def ChatRequestsGivenShowProfileCallback(update: Update, context: ContextT
 
 
 async def ChatRequestsGivenProfileGoBackCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user wants to go back from the given chat request profile
+    """
     query = update.callback_query
     await query.answer()
 
@@ -419,6 +440,10 @@ async def ChatRequestsGivenProfileGoBackCallback(update: Update, context: Contex
 
 
 async def ChatRequestsGottenMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user clicks on one of their gotten chat requests.
+    This function shows some options for that user.
+    """
     other_user_id = update.message.text.split()[-1].split('_', maxsplit=1)[-1]
 
     message_text = (
@@ -434,13 +459,18 @@ async def ChatRequestsGottenMenuCallback(update: Update, context: ContextTypes.D
 
 
 async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user accepts a gotten chat request
+    """
     query = update.callback_query
     await query.answer()
 
     other_user_id = int(query.message.text.split(maxsplit=1)[0])
     this_user_id = int(update.effective_user.id)
 
+    # Add the users id to the chatting_filter
     chatting_filter.add_chat_ids([other_user_id, this_user_id])
+    # Save the chatting_filter in a pickle file
     with open('chatting_filter.pkl', 'wb') as file:
         pickle.dump(chatting_filter, file)
 
@@ -448,6 +478,7 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
 
+    # Save user ids in bot_data['chatting_with'] dictionary
     bot_data['chatting_with'][other_user_id] = this_user_id
     bot_data['chatting_with'][this_user_id] = other_user_id
 
@@ -488,6 +519,9 @@ async def ChatRequestsGottenAcceptRequestCallback(update: Update, context: Conte
 
 
 async def ChatRequestsGottenRejectRequestCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user rejects a gotten chat request
+    """
     query = update.callback_query
     await query.answer()
 
@@ -515,6 +549,9 @@ async def ChatRequestsGottenRejectRequestCallback(update: Update, context: Conte
 
 
 async def ChatRequestsGottenShowProfileCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user wants to see the profile of a gotten chat request
+    """
     query = update.callback_query
     await query.answer()
 
@@ -531,6 +568,9 @@ async def ChatRequestsGottenShowProfileCallback(update: Update, context: Context
 
 
 async def ChatRequestsGottenProfileGoBackCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user wants to go back from the gotten chat request profile
+    """
     query = update.callback_query
     await query.answer()
 
@@ -547,6 +587,9 @@ async def ChatRequestsGottenProfileGoBackCallback(update: Update, context: Conte
 
 
 async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function for sending messages in a chat between users
+    """
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -559,13 +602,14 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     other_user_id = bot_data['chatting_with'][this_user_id]
 
     message = update.message
-    if message.forward_date:  # If the message is forwarded
+    if message.forward_date:  # If the message is forwarded, forward it
         message_bot_sent = await context.bot.forward_message(chat_id=other_user_id,
                                                              from_chat_id=this_user_id,
                                                              message_id=message.message_id,
                                                              write_timeout=30,
                                                              connect_timeout=30)
     else:
+        # Get the reply message id if the message is a reply.
         reply_to_message_id = GetReplyMessageId(update, context)
         message_bot_sent = await context.bot.copy_message(chat_id=other_user_id,
                                                           from_chat_id=this_user_id,
@@ -574,6 +618,7 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                                                           connect_timeout=30,
                                                           reply_to_message_id=reply_to_message_id)
 
+    # Linking messages the user sent with that message in another chat which the bot has sent
     bot_data['message_ids'][other_user_id][message_bot_sent.message_id] = message.message_id
     bot_data['message_ids'][this_user_id][message.message_id] = message_bot_sent.message_id
 
@@ -581,6 +626,9 @@ async def ChattingCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def ChattingEditedTextCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function for text-edited messages
+    """
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -606,6 +654,9 @@ async def ChattingEditedTextCallback(update: Update, context: ContextTypes.DEFAU
 
 
 async def ChattingEditedMediaCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function for media-edited messages
+    """
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -658,6 +709,9 @@ async def ChattingEditedMediaCallback(update: Update, context: ContextTypes.DEFA
 
 
 async def ChattingEditedCaptionCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function for caption-edited messages
+    """
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -683,6 +737,10 @@ async def ChattingEditedCaptionCallback(update: Update, context: ContextTypes.DE
 
 
 async def ChattingEditedMessageButtonCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Callback function for edited_keyboard.
+    This function tells the user that this message is edited
+    """
     query = update.callback_query
     message_text = (
         "این پیام ویرایش شده است!"
@@ -693,6 +751,10 @@ async def ChattingEditedMessageButtonCallback(update: Update, context: ContextTy
 
 
 async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """
+    Error handler which tells the user to send their message again if the error was a timeout error.
+    Otherwise, it logs the exception in the log file.
+    """
     if not isinstance(update, Update):
         return
 
@@ -705,6 +767,9 @@ async def ErrorHandler(update: object, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Runs when the user sends /end_chat. To end the chat between two users
+    """
     bot_data = context.bot_data
     if 'chatting_with' not in bot_data:
         bot_data['chatting_with'] = {}
@@ -716,10 +781,13 @@ async def ChattingEndChatCallback(update: Update, context: ContextTypes.DEFAULT_
 
     other_user_id = bot_data['chatting_with'][this_user_id]
 
+    # Remove the user ids from chatting_filter
     chatting_filter.remove_chat_ids([this_user_id, other_user_id])
+    # Save the chatting_filter in a pickle file
     with open('chatting_filter.pkl', 'wb') as file:
         pickle.dump(chatting_filter, file)
 
+    # delete chatting_with and message_ids of the users
     del bot_data['chatting_with'][this_user_id]
     del bot_data['chatting_with'][other_user_id]
 
