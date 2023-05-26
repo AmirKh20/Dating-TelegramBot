@@ -46,7 +46,6 @@ messages = {
     'Financial': {
         'Menu': MessageHandler(filters.Regex('^مالی$'), FinancialEntryCallback),
         'Buy-Plan': MessageHandler(filters.Regex('^خرید پلن$'), FinancialBuyPlanCallback),
-        'Balance': MessageHandler(filters.Regex('^موجودی$'), FinancialBalanceCallback),
         'Changes': {
             'Menu': MessageHandler(filters.Regex('^تبدیل$'), FinancialChangesCallback),
             'Gems-To-Coins': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
@@ -195,7 +194,6 @@ conversations = {
         entry_points=[messages['Financial']['Menu']],
         states={
             FINANCIAL: [messages['Financial']['Buy-Plan'],
-                        messages['Financial']['Balance'],
                         messages['Financial']['Changes']['Menu'],
                         messages['Financial']['Receive-Money'],
                         messages['Financial']['Charge']],
@@ -222,7 +220,6 @@ conversations = {
                    messages['Main-Menu'],
                    messages['Financial']['Menu'],
                    messages['Financial']['Buy-Plan'],
-                   messages['Financial']['Balance'],
                    messages['Financial']['Changes']['Menu'],
                    messages['Financial']['Receive-Money'],
                    messages['Financial']['Charge']],

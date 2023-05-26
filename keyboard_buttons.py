@@ -12,7 +12,8 @@ from utils import (
     FINANCIAL_CHARGE_URL,
     FINANCIAL_RECEIVE_MONEY_URL,
     CHATBOT_URL,
-    THERAPISTS_URL
+    THERAPISTS_URL,
+    BALANCE_URL
 )
 
 button_keyboards = {
@@ -32,7 +33,7 @@ button_keyboards = {
     ]),
 
     'financial_keyboard': ReplyKeyboardMarkup([
-        [KeyboardButton('موجودی'), KeyboardButton('خرید پلن')],
+        [KeyboardButton('موجودی', web_app=WebAppInfo(url=BALANCE_URL)), KeyboardButton('خرید پلن')],
         [KeyboardButton('دریافت وجه', web_app=WebAppInfo(url=FINANCIAL_RECEIVE_MONEY_URL)), KeyboardButton('تبدیل')],
         [KeyboardButton('شارژ سکه و الماس', web_app=WebAppInfo(url=FINANCIAL_CHARGE_URL))],
         [KeyboardButton('بازگشت به منوی اصلی')]

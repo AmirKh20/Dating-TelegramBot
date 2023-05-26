@@ -944,25 +944,6 @@ async def FinancialBuyPlanCallback(update: Update, context: ContextTypes.DEFAULT
     return FINANCIAL
 
 
-async def FinancialBalanceCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """
-    Runs when موجودی is sent in financial conversation handler.
-    """
-    if not await CheckSubs(update, context):
-        return END
-
-    text = (
-        "سکه:\n"
-        "الماس:\n"
-        "موجودی ریالی:\n"
-        "تعداد گیفت ها و یوزر ارسال کننده:\n"
-        "مدت زمان باقی مانده از پلن فلان:"
-    )
-    await ReplyMessage(update, text=text)
-
-    return FINANCIAL
-
-
 async def FinancialChangesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     Runs when تبدیل is sent in financial conversation handler.
