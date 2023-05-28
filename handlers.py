@@ -46,9 +46,7 @@ messages = {
 
     'Financial': {
         'Menu': MessageHandler(filters.Regex('^مالی$'), FinancialEntryCallback),
-        'Buy-Plan': MessageHandler(filters.Regex('^خرید پلن$'), FinancialBuyPlanCallback),
         'Changes': {
-            'Menu': MessageHandler(filters.Regex('^تبدیل$'), FinancialChangesCallback),
             'Gems-To-Coins': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
                                             FinancialChangesGemsToCoinsReadGemsCallback),
             'Coins-To-Gems': MessageHandler(filters.Regex('^\d+$') & filters.REPLY & ~filters.COMMAND,
@@ -198,8 +196,10 @@ conversations = {
     'Financial': ConversationHandler(
         entry_points=[messages['Financial']['Menu']],
         states={
-            FINANCIAL: [messages['Financial']['Buy-Plan'],
-                        messages['Financial']['Changes']['Menu'],
+            FINANCIAL: [CallbackQueryHandler(pattern='^buy_plan$',
+                                             callback=FinancialBuyPlanCallback),
+                        CallbackQueryHandler(pattern='^financial_change$',
+                                             callback=FinancialChangesCallback),
                         messages['Financial']['Receive-Money'],
                         messages['Financial']['Charge']],
 
@@ -222,10 +222,13 @@ conversations = {
         },
         fallbacks=[commands['Main-Menu'],
                    commands['Start'],
-                   messages['Main-Menu'],
+                   CallbackQueryHandler(pattern='^back_to_main_menu$',
+                                        callback=MainMenuCallback),
                    messages['Financial']['Menu'],
-                   messages['Financial']['Buy-Plan'],
-                   messages['Financial']['Changes']['Menu'],
+                   CallbackQueryHandler(pattern='^buy_plan$',
+                                        callback=FinancialBuyPlanCallback),
+                   CallbackQueryHandler(pattern='^financial_change$',
+                                        callback=FinancialChangesCallback),
                    messages['Financial']['Receive-Money'],
                    messages['Financial']['Charge']],
         map_to_parent={

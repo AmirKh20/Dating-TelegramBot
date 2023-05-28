@@ -293,7 +293,14 @@ async def MainMenuCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     """
     Runs when we want to get back to the default keyboard buttons.
     """
-    await ReplyMessage(update, 'منوی اصلی:', button_keyboards['default_keyboard'])
+    query = update.callback_query
+    if query:
+        await query.answer()
+        await SendMessage(update, context,
+                          text='منوی اصلی:', reply_markup=button_keyboards['default_keyboard'])
+    else:
+        await ReplyMessage(update, 'منوی اصلی:', button_keyboards['default_keyboard'])
+
     await CheckSubs(update, context)
     return MAIN_MENU_STATE
 
@@ -986,7 +993,9 @@ async def FinancialEntryCallback(update: Update, context: ContextTypes.DEFAULT_T
     """
     Runs when مالی is sent. It goes into financial conversation handler.
     """
-    await ReplyMessage(update, 'یک گزینه را انتخاب کنید:', reply_keyboard_markup=button_keyboards['financial_keyboard'])
+    await ReplyMessage(update,
+                       text='یک گزینه را انتخاب کنید:',
+                       reply_keyboard_markup=inline_keyboards['financial']['main_keyboard'])
 
     if not await CheckSubs(update, context):
         return END
@@ -996,10 +1005,13 @@ async def FinancialEntryCallback(update: Update, context: ContextTypes.DEFAULT_T
 
 async def FinancialBuyPlanCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when خرید پلن is sent in financial conversation handler.
+    Runs when خرید پلن is clicked in the financial menu.
     """
     if not await CheckSubs(update, context):
         return END
+
+    query = update.callback_query
+    await query.answer()
 
     plans = (
         "پلن های ماهانه:\n"
@@ -1007,21 +1019,27 @@ async def FinancialBuyPlanCallback(update: Update, context: ContextTypes.DEFAULT
         "نقره: 30 الماس + 4 سکه = 58,000 تومان\n"
         "طلایی: 60 الماس + 8 سکه = 108,000 تومان\n"
     )
-    await ReplyMessage(update, text=plans, reply_keyboard_markup=inline_keyboards['financial']['buy-plan'])
+    await query.edit_message_text(text=plans,
+                                  reply_markup=inline_keyboards['financial']['buy-plan'])
 
     return FINANCIAL
 
 
 async def FinancialChangesCallback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Runs when تبدیل is sent in financial conversation handler.
+    Runs when تبدیل is clicked in the financial menu.
     """
     if not await CheckSubs(update, context):
         return END
 
-    await ReplyMessage(update,
-                       text='یک گزینه را انتخاب کنید',
-                       reply_keyboard_markup=inline_keyboards['financial']['changes_keyboard'])
+    query = update.callback_query
+    await query.answer()
+
+    message_text = (
+        "یک گزینه را انتخاب کنید:"
+    )
+    await query.edit_message_text(text=message_text,
+                                  reply_markup=inline_keyboards['financial']['changes_keyboard'])
 
     return FINANCIAL_CHANGES
 
@@ -1054,7 +1072,7 @@ async def FinancialChangesGemsToCoinsReadGemsCallback(update: Update, context: C
     await ReplyMessage(update, text=f'چک کردن موجودی الماس ها برای {gems_input} الماس...')
     await SendMessage(update, context, text='تبدیل الماس به سکه...')
     await SendMessage(update, context, text='با موفقیت انجام شد...\nموجودی:',
-                      reply_markup=button_keyboards['financial_keyboard'])
+                      reply_markup=inline_keyboards['financial']['main_keyboard'])
 
     return FINANCIAL
 
@@ -1087,7 +1105,7 @@ async def FinancialChangesCoinsToGemsReadCoinsCallback(update: Update, context: 
     await ReplyMessage(update, text=f'چک کردن موجودی سکه ها برای {coins_input} سکه...')
     await SendMessage(update, context, text='تبدیل سکه به الماس...')
     await SendMessage(update, context, text='با موفقیت انجام شد...\nموجودی:',
-                      reply_markup=button_keyboards['financial_keyboard'])
+                      reply_markup=inline_keyboards['financial']['main_keyboard'])
 
     return FINANCIAL
 
@@ -1120,7 +1138,7 @@ async def FinancialChangesGiftsToCoinsReadGiftsCallback(update: Update, context:
     await ReplyMessage(update, text=f'چک کردن موجودی گیفت ها برای گیفت {gift_input}')
     await SendMessage(update, context, text='تبدیل گیفت به سکه...')
     await SendMessage(update, context, text='با موفقیت انجام شد...\nموجودی:',
-                      reply_markup=button_keyboards['financial_keyboard'])
+                      reply_markup=inline_keyboards['financial']['main_keyboard'])
 
     return FINANCIAL
 
@@ -1153,7 +1171,7 @@ async def FinancialChangesGiftsToGemsReadGiftsCallback(update: Update, context: 
     await ReplyMessage(update, text=f'چک کردن موجودی گیفت ها برای گیفت {gift_input}')
     await SendMessage(update, context, text='تبدیل گیفت به الماس...')
     await SendMessage(update, context, text='با موفقیت انجام شد...\nموجودی:',
-                      reply_markup=button_keyboards['financial_keyboard'])
+                      reply_markup=inline_keyboards['financial']['main_keyboard'])
 
     return FINANCIAL
 

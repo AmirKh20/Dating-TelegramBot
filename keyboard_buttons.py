@@ -32,12 +32,6 @@ button_keyboards = {
         [KeyboardButton('بازگشت به منوی اصلی'), KeyboardButton('پرسش و پاسخ')]
     ]),
 
-    'financial_keyboard': ReplyKeyboardMarkup([
-        [KeyboardButton('موجودی', web_app=WebAppInfo(url=BALANCE_URL)), KeyboardButton('خرید پلن')],
-        [KeyboardButton('دریافت وجه', web_app=WebAppInfo(url=FINANCIAL_RECEIVE_MONEY_URL)), KeyboardButton('تبدیل')],
-        [KeyboardButton('شارژ سکه و الماس', web_app=WebAppInfo(url=FINANCIAL_CHARGE_URL))],
-        [KeyboardButton('بازگشت به منوی اصلی')]
-    ]),
 }
 
 inline_keyboards = {
@@ -92,6 +86,18 @@ inline_keyboards = {
     },
 
     'financial': {
+        'main_keyboard': InlineKeyboardMarkup([
+            [InlineKeyboardButton(text='موجودی', web_app=WebAppInfo(url=BALANCE_URL)),
+             InlineKeyboardButton(text='خرید پلن', callback_data='buy_plan')],
+
+            [InlineKeyboardButton(text='دریافت وجه', web_app=WebAppInfo(url=FINANCIAL_RECEIVE_MONEY_URL)),
+             InlineKeyboardButton(text='تبدیل', callback_data='financial_change')],
+
+            [InlineKeyboardButton(text='شارژ سکه و الماس', web_app=WebAppInfo(url=FINANCIAL_CHARGE_URL))],
+
+            [InlineKeyboardButton(text='بازگشت به منوی اصلی', callback_data='back_to_main_menu')]
+        ]),
+
         'changes_keyboard': InlineKeyboardMarkup([
             [InlineKeyboardButton('الماس به سکه', callback_data='gems_to_coins'),
              InlineKeyboardButton('سکه به الماس', callback_data='coins_to_gems')],
